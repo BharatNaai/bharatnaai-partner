@@ -8,23 +8,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:partner_app/main.dart';
+import 'package:partner_app/app.dart';
+import 'package:partner_app/core/constants/app_strings.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('App loads splash screen', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
-
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    
+    // Wait for initial frame
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify that splash screen content is displayed.
+    expect(find.text(AppStrings.appName), findsOneWidget);
+    expect(find.text(AppStrings.appPartner), findsOneWidget);
+    
+    // Verify scissors icon is present
+    expect(find.byIcon(Icons.content_cut_rounded), findsOneWidget);
   });
 }
