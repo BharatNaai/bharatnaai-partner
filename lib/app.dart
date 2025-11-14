@@ -2,12 +2,12 @@ import 'package:partner_app/routes/app_routes.dart';
 import 'package:partner_app/core/constants/app_strings.dart';
 import 'package:partner_app/widgets/connectivity_banner.dart';
 import 'package:flutter/material.dart';
-import 'package:partner_app/core/services/route_observer_service.dart';
+import 'package:partner_app/services/route_observer_service.dart';
 import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'main.dart'; // Import to access navigatorKey
-import 'package:partner_app/core/services/idle_timeout_service.dart';
-import 'package:partner_app/core/services/session_expiry_service.dart';
+import 'package:partner_app/services/idle_timeout_service.dart';
+import 'package:partner_app/services/session_expiry_service.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
