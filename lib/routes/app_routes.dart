@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:partner_app/screens/welcome/welcome_screen.dart';
 import 'package:partner_app/screens/auth/login_screen.dart';
 import 'package:partner_app/screens/auth/register_screen.dart';
+import 'package:partner_app/screens/auth/forgot_password.dart';
+import 'package:partner_app/screens/auth/otp_verification.dart';
+import 'package:partner_app/screens/auth/change_password_screen.dart';
 import 'package:partner_app/screens/dashboard/dashboard_screen.dart';
 import 'package:partner_app/screens/settings/settings_screen.dart';
 import 'package:partner_app/screens/welcome/welcome_success_screen.dart';
@@ -15,6 +18,7 @@ class AppRoutes {
   static const String login = '/login';
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
+  static const String otpVerification = '/otp-verification';
   static const String dashboard = '/dashboard';
   static const String patientList = '/patients';
   static const String addPatient = '/add-patient';
@@ -37,50 +41,65 @@ class AppRoutes {
           builder: (_) => const SplashScreen(),
           settings: settings,
         );
-      
+
       case AppRoutes.welcome:
         return MaterialPageRoute(
           builder: (_) => WelcomeScreen(),
           settings: settings,
         );
-      
+
       case AppRoutes.welcomeSuccess:
         return MaterialPageRoute(
           builder: (_) => const WelcomeSuccessScreen(),
           settings: settings,
         );
-      
+
       case AppRoutes.login:
         return MaterialPageRoute(
           builder: (_) => const LoginScreen(),
           settings: settings,
         );
-      
+
       case AppRoutes.register:
         return MaterialPageRoute(
           builder: (_) => const RegisterScreen(),
           settings: settings,
         );
-      
+
+      case AppRoutes.forgotPassword:
+        return MaterialPageRoute(
+          builder: (_) => const ForgotPasswordScreen(),
+          settings: settings,
+        );
+
+      case AppRoutes.otpVerification:
+        return MaterialPageRoute(
+          builder: (_) => const OtpVerificationScreen(),
+          settings: settings,
+        );
+
+      case AppRoutes.changePassword:
+        return MaterialPageRoute(
+          builder: (_) => const ChangePasswordScreen(),
+          settings: settings,
+        );
+
       case AppRoutes.dashboard:
         return MaterialPageRoute(
           builder: (_) => const DashboardScreen(),
           settings: settings,
         );
-      
+
       case AppRoutes.settings:
         return MaterialPageRoute(
           builder: (_) => const SettingsScreen(),
           settings: settings,
         );
-      
+
       default:
         return MaterialPageRoute(
-          builder: (_) => const Scaffold(
-            body: Center(
-              child: Text('Route not found'),
-            ),
-          ),
+          builder: (_) =>
+              const Scaffold(body: Center(child: Text('Route not found'))),
           settings: settings,
         );
     }
@@ -88,26 +107,14 @@ class AppRoutes {
 
   // Navigation helpers
   static void navigateToLogin(BuildContext context) {
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      login,
-      (route) => false,
-    );
+    Navigator.pushNamedAndRemoveUntil(context, login, (route) => false);
   }
 
   static void navigateToDashboard(BuildContext context) {
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      dashboard,
-      (route) => false,
-    );
+    Navigator.pushNamedAndRemoveUntil(context, dashboard, (route) => false);
   }
 
   static void navigateToWelcome(BuildContext context) {
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      welcome,
-      (route) => false,
-    );
+    Navigator.pushNamedAndRemoveUntil(context, welcome, (route) => false);
   }
 }

@@ -6,6 +6,10 @@ import 'package:partner_app/core/constants/app_strings.dart';
 import 'package:partner_app/providers/auth_provider.dart';
 import 'package:partner_app/routes/app_routes.dart';
 
+import '../../widgets/app_icon.dart';
+import '../../widgets/common_button.dart';
+import '../../widgets/common_text_field.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -219,20 +223,8 @@ class _LoginScreenState extends State<LoginScreen>
                 child: Column(
                   children: [
                     const SizedBox(height: 72),
-                    
-                    // Animated Logo
-                    ScaleTransition(
-                      scale: _scaleAnimation,
-                      child: AnimatedBuilder(
-                        animation: _pulseAnimation,
-                        builder: (context, child) {
-                          return Transform.scale(
-                            scale: _pulseAnimation.value,
-                            child: _buildLogo(),
-                          );
-                        },
-                      ),
-                    ),
+
+                    const AppIcon(icon: Icons.content_cut_rounded),
                     
                     const SizedBox(height: 12),
                     
@@ -289,38 +281,6 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildLogo() {
-    return Container(
-      width: 88,
-      height: 88,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: AppColors.loginLightPurpleRing,
-          width: 7,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.loginLightPurpleRing.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-        ),
-        child: const Icon(
-          Icons.content_cut_rounded,
-          size: 28,
-          color: AppColors.loginPrimaryPurple,
-        ),
-      ),
-    );
-  }
-
   Widget _buildLoginCard(double maxWidth) {
     return Container(
       width: maxWidth,
@@ -342,7 +302,10 @@ class _LoginScreenState extends State<LoginScreen>
           const SizedBox(height: 12),
           _buildPasswordField(),
           const SizedBox(height: 24),
-          _buildLoginButton(),
+          CommonButton(
+            text: AppStrings.loginButton,
+            onPressed: _isLoading ? null : _handleLogin,
+          ),
           const SizedBox(height: 16),
           _buildForgotPasswordLink(),
         ],
@@ -351,197 +314,32 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Widget _buildPhoneField() {
-    final isFocused = _phoneFocusNode.hasFocus;
-    final hasError = _phoneError != null;
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          height: 56,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: hasError
-                  ? AppColors.loginErrorRed
-                  : isFocused
-                      ? AppColors.loginPrimaryPurple
-                      : AppColors.loginInputBorder,
-              width: 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Icon(
-                  Icons.phone_outlined,
-                  size: 20,
-                  color: hasError
-                      ? AppColors.loginErrorRed
-                      : isFocused
-                          ? AppColors.loginPrimaryPurple
-                          : AppColors.loginInputPlaceholder,
-                ),
-              ),
-              Expanded(
-                child: TextField(
-                  controller: _phoneController,
-                  focusNode: _phoneFocusNode,
-                  keyboardType: TextInputType.phone,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: AppColors.loginTitleText,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: AppStrings.phoneNumber,
-                    hintStyle: GoogleFonts.inter(
-                      fontSize: 14,
-                      color: AppColors.loginInputPlaceholder,
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 18),
-                  ),
-                  onSubmitted: (_) => _passwordFocusNode.requestFocus(),
-                ),
-              ),
-            ],
-          ),
-        ),
-        if (hasError)
-          Padding(
-            padding: const EdgeInsets.only(top: 6, left: 16),
-            child: Text(
-              _phoneError!,
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: AppColors.loginErrorRed,
-              ),
-            ),
-          ),
-      ],
+
+    return CommonTextField(
+      controller: _phoneController,
+      labelText: AppStrings.phoneNumber,
+      keyboardType: TextInputType.phone,
+      prefixIcon: Icons.phone_outlined,
+      errorText: _phoneError,
+      validator: (_) => _phoneError,
+      obscureText: false,
+      maxLines: 1,
     );
   }
 
   Widget _buildPasswordField() {
-    final isFocused = _passwordFocusNode.hasFocus;
-    final hasError = _passwordError != null;
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          height: 56,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: hasError
-                  ? AppColors.loginErrorRed
-                  : isFocused
-                      ? AppColors.loginPrimaryPurple
-                      : AppColors.loginInputBorder,
-              width: 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Icon(
-                  Icons.lock_outlined,
-                  size: 20,
-                  color: hasError
-                      ? AppColors.loginErrorRed
-                      : isFocused
-                          ? AppColors.loginPrimaryPurple
-                          : AppColors.loginInputPlaceholder,
-                ),
-              ),
-              Expanded(
-                child: TextField(
-                  controller: _passwordController,
-                  focusNode: _passwordFocusNode,
-                  obscureText: _obscurePassword,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: AppColors.loginTitleText,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: AppStrings.password,
-                    hintStyle: GoogleFonts.inter(
-                      fontSize: 14,
-                      color: AppColors.loginInputPlaceholder,
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 18),
-                  ),
-                  onSubmitted: (_) => _handleLogin(),
-                ),
-              ),
-              GestureDetector(
-                onTap: () => setState(() => _obscurePassword = !_obscurePassword),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  child: Icon(
-                    _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                    size: 20,
-                    color: AppColors.loginInputPlaceholder,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        if (hasError)
-          Padding(
-            padding: const EdgeInsets.only(top: 6, left: 16),
-            child: Text(
-              _passwordError!,
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: AppColors.loginErrorRed,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildLoginButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 48,
-      child: ElevatedButton(
-        onPressed: _isLoading ? null : _handleLogin,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _isLoading
-              ? AppColors.loginPrimaryPurple.withOpacity(0.4)
-              : AppColors.loginPrimaryPurple,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: _isLoading
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-            : Text(
-                AppStrings.login,
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-      ),
+    return CommonTextField(
+      controller: _passwordController,
+      labelText: AppStrings.password,
+      keyboardType: TextInputType.text,
+      prefixIcon: Icons.lock_outlined,
+      suffixIcon:
+          _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+      onSuffixTap: () => setState(() => _obscurePassword = !_obscurePassword),
+      obscureText: _obscurePassword,
+      errorText: _passwordError,
+      validator: (_) => _passwordError,
+      maxLines: 1,
     );
   }
 
@@ -555,7 +353,7 @@ class _LoginScreenState extends State<LoginScreen>
         AppStrings.forgotPassword,
         style: GoogleFonts.inter(
           fontSize: 13,
-          color: AppColors.loginPrimaryPurple,
+          color: AppColors.textPrimary,
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -586,7 +384,7 @@ class _LoginScreenState extends State<LoginScreen>
             AppStrings.register,
             style: GoogleFonts.inter(
               fontSize: 14,
-              color: AppColors.loginPrimaryPurple,
+              color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,
             ),
           ),

@@ -3,20 +3,30 @@ class AppStrings {
   static const String appName = 'BharatNaai';
   static const String appPartner = 'Partner';
   static const String appVersion = '1.0.0';
-  static const String appDescription = 'An application that brings barbers services online';
-  
+  static const String appDescription =
+      'An application that brings barbers services online';
+
   // Authentication
   static const String login = 'Login';
   static const String logout = 'Logout';
   static const String register = 'Register';
-  static const String forgotPassword = 'Forgot Password';
+  static const String forgotPassword = 'Forgot Password ?';
+  static const String forgotPasswordSubtitle =
+      'Enter your registered phone number or email address to reset your password.';
   static const String resetPassword = 'Reset Password';
   static const String email = 'Email';
   static const String password = 'Password';
   static const String confirmPassword = 'Confirm Password';
   static const String firstName = 'First Name';
   static const String lastName = 'Last Name';
-  
+  static const String otpVerificationTitle = 'OTP verification';
+  static const String otpVerification = 'Verify & Continue';
+  static const String sendOtp = 'Send OTP';
+  static const String resendOtp = 'Resend OTP';
+  static const String otp = 'OTP';
+  static const String backToLogin = 'Back to Login';
+  static const String otpSent = 'OTP sent to your email';
+
   // Navigation
   static const String home = 'Home';
   static const String dashboard = 'Dashboard';
@@ -25,7 +35,7 @@ class AppStrings {
   static const String profile = 'Profile';
   static const String templates = 'Templates';
   static const String transcriptions = 'Transcriptions';
-  
+
   // Patient management
   static const String addPatient = 'Add Patient';
   static const String editPatient = 'Edit Patient';
@@ -35,7 +45,7 @@ class AppStrings {
   static const String dateOfBirth = 'Date of Birth';
   static const String phoneNumber = 'Phone Number';
   static const String address = 'Address';
-  
+
   // Medical transcription
   static const String startRecording = 'Start Recording';
   static const String stopRecording = 'Stop Recording';
@@ -43,7 +53,7 @@ class AppStrings {
   static const String transcribe = 'Transcribe';
   static const String saveTranscription = 'Save Transcription';
   static const String transcriptionHistory = 'Transcription History';
-  
+
   // Common actions
   static const String save = 'Save';
   static const String cancel = 'Cancel';
@@ -54,7 +64,7 @@ class AppStrings {
   static const String filter = 'Filter';
   static const String sort = 'Sort';
   static const String refresh = 'Refresh';
-  
+
   // Messages
   static const String success = 'Success';
   static const String error = 'Error';
@@ -64,13 +74,14 @@ class AppStrings {
   static const String noData = 'No data available';
   static const String networkError = 'Network error occurred';
   static const String serverError = 'Server error occurred';
-  
+
   // Validation messages
   static const String requiredField = 'This field is required';
   static const String invalidEmail = 'Please enter a valid email';
-  static const String passwordTooShort = 'Password must be at least 8 characters';
+  static const String passwordTooShort =
+      'Password must be at least 8 characters';
   static const String passwordsDoNotMatch = 'Passwords do not match';
-  
+
   // Permissions
   static const String microphonePermission = 'Microphone permission required';
   static const String storagePermission = 'Storage permission required';
@@ -91,11 +102,11 @@ class AppStrings {
       "2+ hours back in your day. Focus on your patients — not your paperwork";
   static const String loginButton = "Log in";
   static const String signupButton = "Sign up";
-  
+
   // Login Screen Specific
   static const String barberPartnerApp = "Barber Partner App";
-  static const String empoweringSalonProfessionals = "Empowering Salon Professionals";
+  static const String empoweringSalonProfessionals =
+      "Empowering Salon Professionals";
   static const String dontHaveAccount = "Don't have an account? ";
   static const String invalidPhone = "Please enter a valid phone number";
-
 }

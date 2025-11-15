@@ -16,7 +16,7 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _fadeController;
   late AnimationController _scaleController;
   late AnimationController _glowController;
-  
+
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _glowAnimation;
@@ -24,51 +24,39 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize animation controllers
     _fadeController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    
+
     _scaleController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-    
+
     _glowController = AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this,
     );
 
     // Initialize animations
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
+    );
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.5,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _scaleController,
-      curve: Curves.elasticOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(parent: _scaleController, curve: Curves.elasticOut),
+    );
 
-    _glowAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _glowController,
-      curve: Curves.easeInOut,
-    ));
+    _glowAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
+    );
 
     // Start animations
     _startAnimations();
-    
+
     // Navigate to welcome screen after delay
     _navigateToWelcome();
   }
@@ -76,11 +64,11 @@ class _SplashScreenState extends State<SplashScreen>
   void _startAnimations() async {
     // Start fade animation
     _fadeController.forward();
-    
+
     // Start scale animation with slight delay
     await Future.delayed(const Duration(milliseconds: 300));
     _scaleController.forward();
-    
+
     // Start glow animation
     await Future.delayed(const Duration(milliseconds: 500));
     _glowController.repeat(reverse: true);
@@ -151,7 +139,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
               ),
-              
+
               // Bottom section with app info
               FadeTransition(
                 opacity: _fadeAnimation,
@@ -185,9 +173,9 @@ class _SplashScreenState extends State<SplashScreen>
                           ],
                         ),
                       ),
-                      
+
                       const SizedBox(height: 8),
-                      
+
                       // Tagline
                       Text(
                         'Grow Your Salon Business',
@@ -198,9 +186,9 @@ class _SplashScreenState extends State<SplashScreen>
                           letterSpacing: 0.5,
                         ),
                       ),
-                      
+
                       const SizedBox(height: 16),
-                      
+
                       // Version
                       Text(
                         'v${AppStrings.appVersion}',
@@ -248,23 +236,16 @@ class _SplashScreenState extends State<SplashScreen>
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  AppColors.primaryColor,
-                  AppColors.tealGreen,
-                ],
+                colors: [AppColors.primaryColor, AppColors.tealGreen],
               ),
             ),
           ),
-          
+
           // Main icon - salon scissors
           Stack(
             alignment: Alignment.center,
             children: [
-              Icon(
-                Icons.content_cut_rounded,
-                size: 50,
-                color: AppColors.white,
-              ),
+              Icon(Icons.content_cut_rounded, size: 50, color: AppColors.white),
               // Small sparkle effect
               Positioned(
                 top: 5,
@@ -277,7 +258,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
             ],
           ),
-          
+
           // Small decorative elements
           Positioned(
             top: 25,
@@ -291,7 +272,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
             ),
           ),
-          
+
           Positioned(
             bottom: 30,
             left: 30,
