@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:partner_app/services/route_observer_service.dart';
 import 'dart:async';
 import 'package:app_links/app_links.dart';
-import 'main.dart'; // Import to access navigatorKey
+import 'main.dart';
 import 'package:partner_app/services/idle_timeout_service.dart';
 import 'package:partner_app/services/session_expiry_service.dart';
 

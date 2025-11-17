@@ -5,6 +5,7 @@ import 'package:partner_app/core/constants/app_strings.dart';
 import 'package:partner_app/providers/auth_provider.dart';
 import 'package:partner_app/routes/app_routes.dart';
 
+import '../../widgets/common_button.dart';
 import '../../widgets/common_text_field.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -52,7 +53,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           backgroundColor: AppColors.successColor,
         ),
       );
-      Navigator.pushReplacementNamed(context, AppRoutes.login);
+      Navigator.pushReplacementNamed(context, AppRoutes.welcomeSuccess);
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -212,37 +213,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 // Register Button
                 Consumer<AuthProvider>(
                   builder: (context, authProvider, child) {
-                    return SizedBox(
+                    return CommonButton(
+                      text: AppStrings.register,
+                      onPressed: authProvider.isLoading ? null : _handleRegister,
+                      isLoading: authProvider.isLoading,
                       width: double.infinity,
                       height: 56,
-                      child: ElevatedButton(
-                        onPressed: authProvider.isLoading
-                            ? null
-                            : _handleRegister,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: authProvider.isLoading
-                            ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
-                            : const Text(
-                                AppStrings.register,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                      ),
+                      backgroundColor: AppColors.primaryColor,
+                      textColor: Colors.white,
+                      disabledBackgroundColor: AppColors.borderGrey,
+                      disabledTextColor: Colors.white70,
                     );
                   },
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 12),
 
                 // Login Link
                 Row(

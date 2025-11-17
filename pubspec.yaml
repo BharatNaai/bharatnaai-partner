@@ -58,6 +58,13 @@ dependencies:
 
   shared_preferences: ^2.5.3
 
+  # Location & geocoding
+  geolocator: ^9.0.2
+  geocoding: ^2.1.0
+
+  # Image picker for document uploads
+  image_picker: ^1.1.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

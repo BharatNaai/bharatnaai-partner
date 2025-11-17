@@ -9,6 +9,9 @@ import 'package:partner_app/screens/dashboard/dashboard_screen.dart';
 import 'package:partner_app/screens/settings/settings_screen.dart';
 import 'package:partner_app/screens/welcome/welcome_success_screen.dart';
 import 'package:partner_app/screens/splash/splash_screen.dart';
+import 'package:partner_app/screens/profile_setup/profile_setup_step1.dart';
+import 'package:partner_app/screens/profile_setup/profile_setup_step2.dart';
+import 'package:partner_app/screens/profile_setup/profile_setup_step3.dart';
 
 class AppRoutes {
   // Route names
@@ -32,6 +35,9 @@ class AppRoutes {
   static const String settings = '/settings';
   static const String profile = '/profile';
   static const String changePassword = '/change-password';
+  static const String profileStep1 = '/profile-setup-step1';
+  static const String profileStep2 = '/profile-setup-step2';
+  static const String profileStep3 = '/profile-setup-step3';
 
   // Route generator
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -81,6 +87,24 @@ class AppRoutes {
       case AppRoutes.changePassword:
         return MaterialPageRoute(
           builder: (_) => const ChangePasswordScreen(),
+          settings: settings,
+        );
+
+      case AppRoutes.profileStep1:
+        return MaterialPageRoute(
+          builder: (_) => const ProfileSetupStep1Screen(),
+          settings: settings,
+        );
+
+      case AppRoutes.profileStep2:
+        return MaterialPageRoute(
+          builder: (_) => const ProfileSetupStep2Screen(),
+          settings: settings,
+        );
+
+      case AppRoutes.profileStep3:
+        return MaterialPageRoute(
+          builder: (_) => const ProfileSetupStep3Screen(),
           settings: settings,
         );
 

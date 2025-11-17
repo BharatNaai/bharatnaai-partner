@@ -19,7 +19,7 @@ class WelcomeSuccessScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              
+
               // Success Icon
               Container(
                 width: 120,
@@ -34,9 +34,9 @@ class WelcomeSuccessScreen extends StatelessWidget {
                   color: AppColors.successColor,
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Success Title
               Text(
                 'Welcome to ${AppStrings.appName}!',
@@ -47,9 +47,9 @@ class WelcomeSuccessScreen extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Success Message
               Text(
                 'You\'re all set! Start exploring the features and enjoy your experience with ${AppStrings.appName} ${AppStrings.appPartner}.',
@@ -60,25 +60,12 @@ class WelcomeSuccessScreen extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              
+
               const Spacer(),
-              
+
               // Continue Button
               CommonButton(
-                text: 'Get Started',
-                onPressed: () {
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    AppRoutes.dashboard,
-                    (route) => false,
-                  );
-                },
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Skip to Login
-              TextButton(
+                text: 'Login To Get Started',
                 onPressed: () {
                   Navigator.pushNamedAndRemoveUntil(
                     context,
@@ -86,17 +73,9 @@ class WelcomeSuccessScreen extends StatelessWidget {
                     (route) => false,
                   );
                 },
-                child: Text(
-                  'Go to Login',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.linkBlue,
-                  ),
-                ),
               ),
-              
-              const SizedBox(height: 24),
+
+              const SizedBox(height: 16),
             ],
           ),
         ),
