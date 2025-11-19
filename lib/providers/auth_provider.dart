@@ -1,6 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:partner_app/models/barber_register_request.dart';
+import 'package:partner_app/models/device_info.dart';
+import 'package:partner_app/services/auth_service.dart';
 
 class AuthProvider extends ChangeNotifier {
+  final AuthService _authService = AuthService();
+
   bool _isAuthenticated = false;
   bool _isLoading = false;
   String? _userToken;
@@ -40,20 +47,38 @@ class AuthProvider extends ChangeNotifier {
   }
 
   // Register method
-  Future<bool> register(String email, String password, String firstName, String lastName) async {
+  Future<bool> register(
+    String email,
+    String password,
+    String firstName,
+    String phoneNumber,
+  ) async {
     _setLoading(true);
     _clearError();
 
     try {
-      // TODO: Implement actual registration logic
-      await Future.delayed(const Duration(seconds: 2)); // Simulate API call
-      
-      // Placeholder logic
-      if (email.isNotEmpty && password.isNotEmpty) {
+      final deviceInfo = DeviceInfo(
+        deviceId: 'unknown',
+        appVersion: '1.0.0',
+        deviceType: Platform.isAndroid ? 'android' : 'ios',
+      );
+
+      final request = BarberRegisterRequest(
+        barberName: firstName,
+        phone: phoneNumber,
+        email: email,
+        password: password,
+        deviceInfo: deviceInfo,
+      );
+
+      final response = await _authService.registerBarber(request);
+
+      if (response['success'] == true) {
         _setLoading(false);
         return true;
       } else {
-        _setError('Registration failed');
+        final message = response['message'] as String? ?? 'Registration failed';
+        _setError(message);
         _setLoading(false);
         return false;
       }

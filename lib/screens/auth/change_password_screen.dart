@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:partner_app/core/constants/app_colors.dart';
 import 'package:partner_app/core/constants/app_strings.dart';
 import 'package:partner_app/routes/app_routes.dart';
+import 'package:partner_app/utils/validation_utils.dart';
 
 import '../../widgets/app_icon.dart';
 import '../../widgets/common_button.dart';
@@ -59,11 +60,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
     bool isValid = true;
 
-    if (password.isEmpty) {
-      _passwordError = AppStrings.requiredField;
-      isValid = false;
-    } else if (password.length < 8) {
-      _passwordError = AppStrings.passwordTooShort;
+    final passwordErrors = ValidationUtils.getPasswordErrors(password);
+    if (passwordErrors.isNotEmpty) {
+      _passwordError = passwordErrors.first;
       isValid = false;
     }
 

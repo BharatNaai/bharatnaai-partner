@@ -4,6 +4,7 @@ import 'package:partner_app/core/constants/app_colors.dart';
 import 'package:partner_app/core/constants/app_strings.dart';
 import 'package:partner_app/providers/auth_provider.dart';
 import 'package:partner_app/routes/app_routes.dart';
+import 'package:partner_app/utils/validation_utils.dart';
 
 import '../../widgets/common_button.dart';
 import '../../widgets/common_text_field.dart';
@@ -137,9 +138,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     if (value == null || value.isEmpty) {
                       return AppStrings.requiredField;
                     }
-                    if (!RegExp(
-                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                    ).hasMatch(value)) {
+                    if (!ValidationUtils.isValidEmail(value)) {
                       return AppStrings.invalidEmail;
                     }
                     return null;
@@ -170,8 +169,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     if (value == null || value.isEmpty) {
                       return AppStrings.requiredField;
                     }
-                    if (value.length < 8) {
-                      return AppStrings.passwordTooShort;
+                    final errors = ValidationUtils.getPasswordErrors(value);
+                    if (errors.isNotEmpty) {
+                      return errors.first;
                     }
                     return null;
                   },

@@ -6,6 +6,7 @@ import 'package:partner_app/core/constants/app_strings.dart';
 import 'package:partner_app/providers/auth_provider.dart';
 import 'package:partner_app/routes/app_routes.dart';
 
+import '../../utils/validation_utils.dart';
 import '../../widgets/app_icon.dart';
 import '../../widgets/common_button.dart';
 import '../../widgets/common_text_field.dart';
@@ -126,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen>
     if (_phoneController.text.trim().isEmpty) {
       _phoneError = AppStrings.requiredField;
       isValid = false;
-    } else if (!_isValidPhone(_phoneController.text.trim())) {
+    } else if (!ValidationUtils.isValidPhone(_phoneController.text.trim())) {
       _phoneError = AppStrings.invalidPhone;
       isValid = false;
     }
@@ -151,7 +152,7 @@ class _LoginScreenState extends State<LoginScreen>
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final success = await authProvider.login(
         _phoneController.text.trim(),
-        _passwordController.text,
+        _passwordController.text.trim(),
       );
 
       if (success && mounted) {
@@ -168,13 +169,6 @@ class _LoginScreenState extends State<LoginScreen>
         _shakeCard();
       }
     }
-  }
-
-  bool _isValidPhone(String phone) {
-    // Remove all non-digit characters
-    String digitsOnly = phone.replaceAll(RegExp(r'\D'), '');
-    // Check if it has 8-15 digits (international phone number range)
-    return digitsOnly.length >= 8 && digitsOnly.length <= 15;
   }
 
   void _shakeCard() {
@@ -299,7 +293,9 @@ class _LoginScreenState extends State<LoginScreen>
       child: Column(
         children: [
           _buildPhoneField(),
+          
           const SizedBox(height: 12),
+          
           _buildPasswordField(),
           const SizedBox(height: 24),
           CommonButton(
