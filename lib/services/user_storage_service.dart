@@ -10,6 +10,7 @@ class UserStorageService {
   static const String _accessTokenKey = 'access_token';
   static const String _isLoggedInKey = 'is_logged_in';
   static const String _refreshTokenKey = 'refresh_token';
+  static const String _barberIdKey = 'barber_id';
 
   // Callback for when user data is cleared
   static VoidCallback? _onDataCleared;
@@ -77,6 +78,20 @@ class UserStorageService {
     return prefs.getBool(_isLoggedInKey) ?? false;
   }
 
+  // Check if a barber session is active (for splash routing)
+  static Future<bool> isBarberLoggedIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isLoggedIn = prefs.getBool(_isLoggedInKey) ?? false;
+    final accessToken = prefs.getString(_accessTokenKey);
+    final barberId = prefs.getString(_barberIdKey);
+
+    return isLoggedIn &&
+        accessToken != null &&
+        accessToken.isNotEmpty &&
+        barberId != null &&
+        barberId.isNotEmpty;
+  }
+
   // Update user data (partial update)
   static Future<void> updateUser(UserModel updatedUser) async {
     final currentUser = await getUser();
@@ -138,6 +153,7 @@ class UserStorageService {
     await prefs.remove(_userKey);
     await prefs.remove(_accessTokenKey);
     await prefs.remove(_refreshTokenKey);
+    await prefs.remove(_barberIdKey);
     await prefs.setBool(_isLoggedInKey, false);
     debugPrint('UserStorageService: All user data cleared');
 
@@ -154,6 +170,23 @@ class UserStorageService {
   static Future<String?> getUserId() async {
     final user = await getUser();
     return user?.userSub;
+  }
+
+  static Future<void> saveBarberLoginSession({
+    required String accessToken,
+    required String refreshToken,
+    required String barberId,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_accessTokenKey, accessToken);
+    await prefs.setString(_refreshTokenKey, refreshToken);
+    await prefs.setString(_barberIdKey, barberId);
+    await prefs.setBool(_isLoggedInKey, true);
+  }
+
+  static Future<String?> getBarberId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_barberIdKey);
   }
 
   // Get user email

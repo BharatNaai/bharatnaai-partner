@@ -5,6 +5,7 @@ class ApiConstants {
   // API Endpoints
   static const String login = 'barbers/login';
   static const String register = 'barbers/register';
+  static const String barberLogin = 'barbers/barber-login';
   static const String refreshToken = '/refresh';
   static const String logout = '/logout';
   static const String forgotPassword = '/forgot-password';

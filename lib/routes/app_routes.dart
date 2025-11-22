@@ -22,7 +22,16 @@ class AppRoutes {
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
   static const String otpVerification = '/otp-verification';
+  static const String home = '/home';
   static const String dashboard = '/dashboard';
+  static const String booking = '/booking';
+  static const String earning = '/earning';
+  static const String add = '/add';
+  static const String bookings = '/bookings';
+  static const String addBooking = '/add-booking';
+  static const String manageServices = '/manage-services';
+  static const String payouts = '/payouts';
+  static const String reviews = '/reviews';
   static const String patientList = '/patients';
   static const String addPatient = '/add-patient';
   static const String editPatient = '/edit-patient';
@@ -109,8 +118,47 @@ class AppRoutes {
         );
 
       case AppRoutes.dashboard:
+      case AppRoutes.home:
         return MaterialPageRoute(
           builder: (_) => const DashboardScreen(),
+          settings: settings,
+        );
+
+      case AppRoutes.bookings:
+      case AppRoutes.booking:
+        return MaterialPageRoute(
+          builder: (_) => const _PlaceholderScreen(title: 'Bookings'),
+          settings: settings,
+        );
+
+      case AppRoutes.addBooking:
+        return MaterialPageRoute(
+          builder: (_) => const _PlaceholderScreen(title: 'Add Booking'),
+          settings: settings,
+        );
+
+      case AppRoutes.manageServices:
+        return MaterialPageRoute(
+          builder: (_) => const _PlaceholderScreen(title: 'Manage Services'),
+          settings: settings,
+        );
+
+      case AppRoutes.payouts:
+      case AppRoutes.earning:
+        return MaterialPageRoute(
+          builder: (_) => const _PlaceholderScreen(title: 'Payouts'),
+          settings: settings,
+        );
+
+      case AppRoutes.reviews:
+        return MaterialPageRoute(
+          builder: (_) => const _PlaceholderScreen(title: 'Reviews'),
+          settings: settings,
+        );
+
+      case AppRoutes.add:
+        return MaterialPageRoute(
+          builder: (_) => const _PlaceholderScreen(title: 'Add Services'),
           settings: settings,
         );
 
@@ -140,5 +188,33 @@ class AppRoutes {
 
   static void navigateToWelcome(BuildContext context) {
     Navigator.pushNamedAndRemoveUntil(context, welcome, (route) => false);
+  }
+
+  static Future<T?> navigateTo<T extends Object?>(
+      BuildContext context, String routeName,
+      {Object? arguments}) {
+    return Navigator.pushNamed<T>(
+      context,
+      routeName,
+      arguments: arguments,
+    );
+  }
+}
+
+class _PlaceholderScreen extends StatelessWidget {
+  final String title;
+
+  const _PlaceholderScreen({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+      ),
+      body: Center(
+        child: Text(title),
+      ),
+    );
   }
 }

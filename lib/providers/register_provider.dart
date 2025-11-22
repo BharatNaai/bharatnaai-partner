@@ -6,6 +6,7 @@ import '../services/service_locator.dart';
 import '../utils/validation_utils.dart';
 import '../models/barber_register_request.dart';
 import '../models/device_info.dart';
+import '../services/device_info_service.dart';
 import '../widgets/custom_toast.dart';
 
 class RegisterProvider with ChangeNotifier {
@@ -199,15 +200,16 @@ class RegisterProvider with ChangeNotifier {
     notifyListeners();
 
     try {
+      final deviceId = await DeviceInfoService.getDeviceId();
       final deviceInfo = DeviceInfo(
-        deviceId: 'unknown',
+        deviceId: deviceId,
         appVersion: '1.0.0',
-        deviceType: 'unknown',
+        deviceType: 'android',
       );
 
       final request = BarberRegisterRequest(
-        barberName: _email, // placeholder, adjust when name is available
-        phone: 'unknown', // placeholder, adjust when phone is available
+        barberName: _email, 
+        phone: 'unknown', 
         email: _email,
         password: _password,
         deviceInfo: deviceInfo,

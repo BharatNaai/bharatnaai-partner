@@ -64,7 +64,7 @@ dependencies:
 
   permission_handler: ^12.0.1
 
-  device_info_plus:
+  device_info_plus: ^10.1.0
 
   # Location & geocoding
   geolocator: ^9.0.2

@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import 'package:partner_app/core/constants/app_colors.dart';
-import 'package:partner_app/core/constants/app_strings.dart';
 import 'package:partner_app/routes/app_routes.dart';
 import 'package:partner_app/providers/location_provider.dart';
 

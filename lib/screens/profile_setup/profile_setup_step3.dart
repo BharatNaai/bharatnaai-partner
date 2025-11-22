@@ -118,7 +118,7 @@ class _ProfileSetupStep3ScreenState extends State<ProfileSetupStep3Screen> {
                       borderRadius: BorderRadius.circular(4),
                       gradient: const LinearGradient(
                         colors: [
-                          AppColors.loginPrimaryPurple,
+                          AppColors.primaryColor,
                           Color(0xFFE4D9FF),
                         ],
                       ),
