@@ -2,52 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../core/constants/app_colors.dart';
-import '../routes/app_routes.dart';
 
 class BottomNavItemConfig {
   final IconData icon;
   final String label;
-  final String route;
 
-  const BottomNavItemConfig({
-    required this.icon,
-    required this.label,
-    required this.route,
-  });
+  const BottomNavItemConfig({required this.icon, required this.label});
 }
 
 const List<BottomNavItemConfig> kBottomNavItems = [
-  BottomNavItemConfig(
-    icon: Icons.home_outlined,
-    label: 'Home',
-    route: AppRoutes.home,
-  ),
-  BottomNavItemConfig(
-    icon: Icons.search,
-    label: 'Search',
-    route: AppRoutes.booking,
-  ),
-  BottomNavItemConfig(
-    icon: Icons.history,
-    label: 'History',
-    route: AppRoutes.earning,
-  ),
-  BottomNavItemConfig(
-    icon: Icons.person_outline,
-    label: 'Profile',
-    route: AppRoutes.profile,
-  ),
+  BottomNavItemConfig(icon: Icons.home_outlined, label: 'Home'),
+  BottomNavItemConfig(icon: Icons.event_note_outlined, label: 'Booking'),
+  BottomNavItemConfig(icon: Icons.account_balance_wallet_outlined, label: 'Earning'),
+  BottomNavItemConfig(icon: Icons.person_outline, label: 'Profile'),
 ];
 
 class CommonBottomNavBar extends StatelessWidget {
-  final String currentRoute;
+  final int currentIndex;
+  final ValueChanged<int> onTabSelected;
 
-  const CommonBottomNavBar({super.key, required this.currentRoute});
-
-  int get _currentIndex {
-    final index = kBottomNavItems.indexWhere((e) => e.route == currentRoute);
-    return index < 0 ? 0 : index;
-  }
+  const CommonBottomNavBar({
+    super.key,
+    required this.currentIndex,
+    required this.onTabSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +49,7 @@ class CommonBottomNavBar extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: List.generate(kBottomNavItems.length, (index) {
                     final item = kBottomNavItems[index];
-                    final bool isSelected = index == _currentIndex;
+                    final bool isSelected = index == currentIndex;
 
                     return _BottomNavItem(
                       config: item,
@@ -79,7 +57,7 @@ class CommonBottomNavBar extends StatelessWidget {
                       textTheme: textTheme,
                       onTap: () {
                         if (!isSelected) {
-                          AppRoutes.navigateTo(context, item.route);
+                          onTabSelected(index);
                         }
                       },
                     );
@@ -88,12 +66,7 @@ class CommonBottomNavBar extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-            top: 0,
-            child: _FloatingAddButton(
-              onTap: () => AppRoutes.navigateTo(context, AppRoutes.add),
-            ),
-          ),
+          Positioned(top: 0, child: _FloatingAddButton(onTap: () {})),
         ],
       ),
     );
@@ -115,7 +88,9 @@ class _BottomNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isSelected ? AppColors.primaryColor : AppColors.loginSubtitleText;
+    final color = isSelected
+        ? AppColors.primaryColor
+        : AppColors.loginSubtitleText;
 
     return InkWell(
       onTap: onTap,
@@ -193,10 +168,7 @@ class _FloatingAddButtonState extends State<_FloatingAddButton>
       animation: _controller,
       builder: (context, child) {
         final scale = 1 - _controller.value;
-        return Transform.scale(
-          scale: scale,
-          child: child,
-        );
+        return Transform.scale(scale: scale, child: child);
       },
       child: GestureDetector(
         onTapDown: _onTapDown,

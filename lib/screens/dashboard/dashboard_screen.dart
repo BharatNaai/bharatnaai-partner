@@ -4,9 +4,33 @@ import 'package:partner_app/core/constants/app_colors.dart';
 import 'package:partner_app/core/constants/app_strings.dart';
 import 'package:partner_app/routes/app_routes.dart';
 import 'package:partner_app/widgets/common_bottom_nav_bar.dart';
+import 'package:partner_app/screens/bookings/bookings_list_screen.dart';
+import 'package:partner_app/models/booking.dart';
+import 'package:partner_app/widgets/booking_widgets.dart';
+import 'package:partner_app/screens/earning_portfolio/earning_screen.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  int _currentIndex = 0;
+
+  late final List<Widget> _screens = [
+    _DashboardHomeTab(),
+    const BookingsListScreen(),
+    const EarningsScreen(),
+    const _SimplePlaceholderTab(title: 'Profile'),
+  ];
+
+  void _onTabSelected(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,6 +38,51 @@ class DashboardScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.loginBackgroundEnd,
+      body: SafeArea(
+        child: IndexedStack(index: _currentIndex, children: _screens),
+      ),
+      bottomNavigationBar: CommonBottomNavBar(
+        currentIndex: _currentIndex,
+        onTabSelected: _onTabSelected,
+      ),
+    );
+  }
+}
+
+class _DashboardHomeTab extends StatefulWidget {
+  @override
+  State<_DashboardHomeTab> createState() => _DashboardHomeTabState();
+}
+
+class _DashboardHomeTabState extends State<_DashboardHomeTab> {
+  late List<Booking> _bookings;
+
+  @override
+  void initState() {
+    super.initState();
+    _bookings = List<Booking>.from(kMockBookings);
+  }
+
+  void _updateBooking(Booking updated) {
+    setState(() {
+      _bookings = _bookings
+          .map((b) => b.id == updated.id ? updated : b)
+          .toList(growable: false);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = GoogleFonts.interTextTheme(Theme.of(context).textTheme);
+
+    final upcomingBookings = _bookings
+        .where((b) => b.mainStatus == BookingMainStatus.upcoming)
+        .toList();
+
+    return Scaffold(
+      backgroundColor: AppColors.loginBackgroundEnd,
+
+      // ------------------ APP BAR -------------------
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
@@ -40,104 +109,144 @@ class DashboardScreen extends StatelessWidget {
             ),
           ],
         ),
-        actions: [
-          const CircleAvatar(
+        actions: const [
+          CircleAvatar(
             radius: 16,
             backgroundColor: AppColors.primaryColor,
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
         ],
       ),
-      body: SafeArea(
-        child: Container(
-          color: AppColors.loginBackgroundEnd,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+
+      // ------------------ BODY ---------------------
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            // ----------- STATS ROW 1 ------------
+            Row(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: _DashboardStatCard(
-                        title: 'Today\'s Earnings',
-                        value: '\u20b96,540',
-                        subtitle: '+12% vs yesterday',
-                        icon: Icons.currency_rupee_rounded,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _DashboardStatCard(
-                        title: 'Total Bookings',
-                        value: '32',
-                        subtitle: 'Today',
-                        icon: Icons.event_available_outlined,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _DashboardStatCard(
-                        title: 'Completed Services',
-                        value: '24',
-                        subtitle: 'Completion 75%',
-                        icon: Icons.check_circle_outline,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _DashboardStatCard(
-                        title: 'Upcoming Booking',
-                        value: '8',
-                        subtitle: 'Next 24 hrs',
-                        icon: Icons.schedule_outlined,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                _SectionCard(
-                  title: 'Upcoming Bookings',
-                  child: Column(
-                    children: const [
-                      _AppointmentTile(
-                        customerName: 'Aarav Mehta',
-                        service: 'Haircut',
-                        when: 'Today 30 PM',
-                        status: 'Confirmed',
-                        statusColor: Colors.green,
-                      ),
-                      SizedBox(height: 12),
-                      _AppointmentTile(
-                        customerName: 'Neha Sharma',
-                        service: 'Makeup',
-                        when: 'Today 6:00 PM',
-                        status: 'Pending',
-                        statusColor: Colors.orange,
-                      ),
-                      SizedBox(height: 12),
-                      _AppointmentTile(
-                        customerName: 'Rohan Gupta',
-                        service: 'Spa',
-                        when: 'Tomorrow 11:00 AM',
-                        status: 'Confirmed',
-                        statusColor: Colors.green,
-                      ),
-                    ],
+                Expanded(
+                  child: _DashboardStatCard(
+                    title: 'Today\'s Earnings',
+                    value: '\u20b96,540',
+                    subtitle: '+12% vs yesterday',
+                    icon: Icons.currency_rupee_rounded,
                   ),
                 ),
-                const SizedBox(height: 72),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _DashboardStatCard(
+                    title: 'Total Bookings',
+                    value: '32',
+                    subtitle: 'Today',
+                    icon: Icons.event_available_outlined,
+                  ),
+                ),
               ],
             ),
-          ),
+
+            const SizedBox(height: 12),
+
+            // ----------- STATS ROW 2 ------------
+            Row(
+              children: [
+                Expanded(
+                  child: _DashboardStatCard(
+                    title: 'Completed Services',
+                    value: '24',
+                    subtitle: 'Completion 75%',
+                    icon: Icons.check_circle_outline,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _DashboardStatCard(
+                    title: 'Upcoming Booking',
+                    value: '8',
+                    subtitle: 'Next 24 hrs',
+                    icon: Icons.schedule_outlined,
+                  ),
+                ),
+              ],
+            ),
+
+            // ----------- UPCOMING BOOKINGS ------------
+            const SizedBox(height: 16),
+            _SectionCard(
+              title: 'Upcoming Bookings',
+              child: Column(
+                children: upcomingBookings.take(3).map((booking) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: BookingCard(
+                      booking: booking,
+                      primaryLabel: 'Start Service',
+                      secondaryLabel: 'Mark As Completed',
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.booking,
+                          arguments: booking,
+                        );
+                      },
+                      onPrimaryAction: () {
+                        _updateBooking(
+                          booking.copyWith(
+                            mainStatus: BookingMainStatus.ongoing,
+                          ),
+                        );
+                      },
+                      onSecondaryAction: () {
+                        _updateBooking(
+                          booking.copyWith(
+                            mainStatus: BookingMainStatus.completed,
+                          ),
+                        );
+                      },
+                      onPhoneTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Calling customer...'),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+
+            const SizedBox(height: 72), // safe space for bottom nav + FAB
+          ],
         ),
       ),
-      bottomNavigationBar: const CommonBottomNavBar(
-        currentRoute: AppRoutes.home,
+    );
+  }
+}
+
+class _SimplePlaceholderTab extends StatelessWidget {
+  final String title;
+
+  const _SimplePlaceholderTab({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = GoogleFonts.interTextTheme(Theme.of(context).textTheme);
+
+    return Container(
+      color: AppColors.loginBackgroundEnd,
+      child: Center(
+        child: Text(
+          title,
+          style: textTheme.titleMedium?.copyWith(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
+        ),
       ),
     );
   }

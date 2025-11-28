@@ -7,6 +7,11 @@ import 'package:partner_app/screens/auth/otp_verification.dart';
 import 'package:partner_app/screens/auth/change_password_screen.dart';
 import 'package:partner_app/screens/dashboard/dashboard_screen.dart';
 import 'package:partner_app/screens/settings/settings_screen.dart';
+import 'package:partner_app/screens/earning_portfolio/earning_screen.dart';
+import 'package:partner_app/screens/earning_portfolio/withdraw_screen.dart';
+import 'package:partner_app/screens/bookings/bookings_list_screen.dart';
+import 'package:partner_app/screens/booking_details/booking_details_screen.dart';
+import 'package:partner_app/models/booking.dart';
 import 'package:partner_app/screens/welcome/welcome_success_screen.dart';
 import 'package:partner_app/screens/splash/splash_screen.dart';
 import 'package:partner_app/screens/profile_setup/profile_setup_step1.dart';
@@ -125,9 +130,18 @@ class AppRoutes {
         );
 
       case AppRoutes.bookings:
-      case AppRoutes.booking:
         return MaterialPageRoute(
-          builder: (_) => const _PlaceholderScreen(title: 'Bookings'),
+          builder: (_) => const BookingsListScreen(),
+          settings: settings,
+        );
+
+      case AppRoutes.booking:
+        final bookingArg = settings.arguments;
+        final booking = bookingArg is Booking ? bookingArg : null;
+        return MaterialPageRoute(
+          builder: (_) => booking == null
+              ? const _PlaceholderScreen(title: 'Booking Details')
+              : BookingDetailsScreen(booking: booking),
           settings: settings,
         );
 
@@ -143,10 +157,17 @@ class AppRoutes {
           settings: settings,
         );
 
-      case AppRoutes.payouts:
       case AppRoutes.earning:
         return MaterialPageRoute(
-          builder: (_) => const _PlaceholderScreen(title: 'Payouts'),
+          builder: (_) => const EarningsScreen(),
+          settings: settings,
+        );
+
+      case AppRoutes.payouts:
+        final amountArg = settings.arguments;
+        final amount = amountArg is int ? amountArg : 0;
+        return MaterialPageRoute(
+          builder: (_) => WithdrawScreen(availableAmount: amount),
           settings: settings,
         );
 
