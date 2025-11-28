@@ -17,6 +17,7 @@ import 'package:partner_app/screens/splash/splash_screen.dart';
 import 'package:partner_app/screens/profile_setup/profile_setup_step1.dart';
 import 'package:partner_app/screens/profile_setup/profile_setup_step2.dart';
 import 'package:partner_app/screens/profile_setup/profile_setup_step3.dart';
+import 'package:partner_app/screens/profile/barbers_profile.dart';
 
 class AppRoutes {
   // Route names
@@ -119,6 +120,12 @@ class AppRoutes {
       case AppRoutes.profileStep3:
         return MaterialPageRoute(
           builder: (_) => const ProfileSetupStep3Screen(),
+          settings: settings,
+        );
+
+      case AppRoutes.profile:
+        return MaterialPageRoute(
+          builder: (_) => const BarbersProfileScreen(),
           settings: settings,
         );
 

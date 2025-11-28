@@ -8,6 +8,7 @@ import 'package:partner_app/screens/bookings/bookings_list_screen.dart';
 import 'package:partner_app/models/booking.dart';
 import 'package:partner_app/widgets/booking_widgets.dart';
 import 'package:partner_app/screens/earning_portfolio/earning_screen.dart';
+import 'package:partner_app/screens/profile/barbers_profile.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -23,7 +24,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _DashboardHomeTab(),
     const BookingsListScreen(),
     const EarningsScreen(),
-    const _SimplePlaceholderTab(title: 'Profile'),
+    const BarbersProfileScreen(),
   ];
 
   void _onTabSelected(int index) {
