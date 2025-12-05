@@ -18,6 +18,7 @@ import 'package:partner_app/screens/profile_setup/profile_setup_step1.dart';
 import 'package:partner_app/screens/profile_setup/profile_setup_step2.dart';
 import 'package:partner_app/screens/profile_setup/profile_setup_step3.dart';
 import 'package:partner_app/screens/profile/barbers_profile.dart';
+import 'package:partner_app/screens/services/services_offered_screen.dart';
 
 class AppRoutes {
   // Route names
@@ -160,7 +161,7 @@ class AppRoutes {
 
       case AppRoutes.manageServices:
         return MaterialPageRoute(
-          builder: (_) => const _PlaceholderScreen(title: 'Manage Services'),
+          builder: (_) => const ServicesOfferedScreen(),
           settings: settings,
         );
 

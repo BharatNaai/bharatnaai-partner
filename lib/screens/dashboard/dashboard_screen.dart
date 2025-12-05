@@ -9,6 +9,8 @@ import 'package:partner_app/models/booking.dart';
 import 'package:partner_app/widgets/booking_widgets.dart';
 import 'package:partner_app/screens/earning_portfolio/earning_screen.dart';
 import 'package:partner_app/screens/profile/barbers_profile.dart';
+import 'package:partner_app/models/service_offering.dart';
+import 'package:partner_app/repositories/service_repository.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -57,11 +59,14 @@ class _DashboardHomeTab extends StatefulWidget {
 
 class _DashboardHomeTabState extends State<_DashboardHomeTab> {
   late List<Booking> _bookings;
+  late List<ServiceOffering> _services;
 
   @override
   void initState() {
     super.initState();
     _bookings = List<Booking>.from(kMockBookings);
+    _services = <ServiceOffering>[];
+    _loadServices();
   }
 
   void _updateBooking(Booking updated) {
@@ -70,6 +75,175 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
           .map((b) => b.id == updated.id ? updated : b)
           .toList(growable: false);
     });
+  }
+
+  Future<void> _loadServices() async {
+    try {
+      final repo = ServiceRepository.instance;
+      final list = await repo.getServices();
+      if (!mounted) return;
+      setState(() {
+        _services = List<ServiceOffering>.from(list);
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to load services. Please try again.'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _openAddServiceDialog() async {
+    final textTheme = GoogleFonts.interTextTheme(Theme.of(context).textTheme);
+
+    String? selectedService;
+    final TextEditingController avgTimeController = TextEditingController();
+    final TextEditingController experienceController = TextEditingController();
+    final TextEditingController costController = TextEditingController();
+    final TextEditingController notesController = TextEditingController();
+
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Text(
+            'Add Service',
+            style: textTheme.titleMedium?.copyWith(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButtonFormField<String>(
+                      value: selectedService,
+                      decoration: const InputDecoration(
+                        labelText: 'Service',
+                        border: OutlineInputBorder(),
+                      ),
+                      items: kServiceOptions
+                          .map(
+                            (option) => DropdownMenuItem<String>(
+                              value: option,
+                              child: Text(option),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (String? value) {
+                        setState(() {
+                          selectedService = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: avgTimeController,
+                      decoration: const InputDecoration(
+                        labelText: 'Average Time (mins)',
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: experienceController,
+                      decoration: const InputDecoration(
+                        labelText: 'Experience (years)',
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: costController,
+                      decoration: const InputDecoration(
+                        labelText: 'Cost (	8)',
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: notesController,
+                      decoration: const InputDecoration(
+                        labelText: 'Notes (optional)',
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: 2,
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (selectedService == null ||
+                    avgTimeController.text.isEmpty ||
+                    experienceController.text.isEmpty ||
+                    costController.text.isEmpty) {
+                  ScaffoldMessenger.of(this.context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please fill all required fields.'),
+                    ),
+                  );
+                  return;
+                }
+
+                final ServiceOffering service = ServiceOffering(
+                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                  name: selectedService!,
+                  averageTime: avgTimeController.text,
+                  experience: experienceController.text,
+                  cost: costController.text,
+                  notes: notesController.text,
+                );
+
+                final repo = ServiceRepository.instance;
+
+                try {
+                  await repo.addService(service);
+                  await _loadServices();
+                  ScaffoldMessenger.of(this.context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Service added successfully.'),
+                    ),
+                  );
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  ScaffoldMessenger.of(this.context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Failed to add service. Please try again.'),
+                    ),
+                  );
+                }
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _navigateToServices() {
+    Navigator.pushNamed(context, AppRoutes.manageServices);
   }
 
   @override
@@ -88,7 +262,7 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimary,
-        titleSpacing: 16,
+        titleSpacing: 24,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -110,12 +284,12 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
             ),
           ],
         ),
-        actions: const [
-          CircleAvatar(
-            radius: 16,
-            backgroundColor: AppColors.primaryColor,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.miscellaneous_services_outlined),
+            tooltip: 'Services I Offer',
+            onPressed: _navigateToServices,
           ),
-          SizedBox(width: 16),
         ],
       ),
 
@@ -125,7 +299,6 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             // ----------- STATS ROW 1 ------------
             Row(
               children: [
@@ -209,9 +382,7 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
                       },
                       onPhoneTap: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Calling customer...'),
-                          ),
+                          const SnackBar(content: Text('Calling customer...')),
                         );
                       },
                     ),
@@ -219,11 +390,17 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
                 }).toList(),
               ),
             ),
-
             const SizedBox(height: 72), // safe space for bottom nav + FAB
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _openAddServiceDialog,
+        backgroundColor: AppColors.buttonPrimary,
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text('Service', style: TextStyle(color: AppColors.white)),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

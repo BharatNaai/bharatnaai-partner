@@ -30,7 +30,6 @@ class AppStrings {
   // Navigation
   static const String home = 'Home';
   static const String dashboard = 'Dashboard';
-  static const String patients = 'Patients';
   static const String settings = 'Settings';
   static const String profile = 'Profile';
   static const String templates = 'Templates';
