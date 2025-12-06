@@ -9,8 +9,12 @@ import 'package:partner_app/models/booking.dart';
 import 'package:partner_app/widgets/booking_widgets.dart';
 import 'package:partner_app/screens/earning_portfolio/earning_screen.dart';
 import 'package:partner_app/screens/profile/barbers_profile.dart';
+import 'package:partner_app/screens/services/services_offered_screen.dart';
 import 'package:partner_app/models/service_offering.dart';
 import 'package:partner_app/repositories/service_repository.dart';
+import 'package:partner_app/widgets/common_text_field.dart';
+import 'package:partner_app/widgets/common_button.dart';
+import 'package:partner_app/widgets/service_offering_dialog.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -25,6 +29,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   late final List<Widget> _screens = [
     _DashboardHomeTab(),
     const BookingsListScreen(),
+    const ServicesOfferedScreen(),
     const EarningsScreen(),
     const BarbersProfileScreen(),
   ];
@@ -96,150 +101,30 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
   }
 
   Future<void> _openAddServiceDialog() async {
-    final textTheme = GoogleFonts.interTextTheme(Theme.of(context).textTheme);
-
-    String? selectedService;
-    final TextEditingController avgTimeController = TextEditingController();
-    final TextEditingController experienceController = TextEditingController();
-    final TextEditingController costController = TextEditingController();
-    final TextEditingController notesController = TextEditingController();
-
-    await showDialog<void>(
+    final ServiceOffering? newService = await showServiceOfferingDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Text(
-            'Add Service',
-            style: textTheme.titleMedium?.copyWith(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          content: StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-              return SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    DropdownButtonFormField<String>(
-                      value: selectedService,
-                      decoration: const InputDecoration(
-                        labelText: 'Service',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: kServiceOptions
-                          .map(
-                            (option) => DropdownMenuItem<String>(
-                              value: option,
-                              child: Text(option),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (String? value) {
-                        setState(() {
-                          selectedService = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: avgTimeController,
-                      decoration: const InputDecoration(
-                        labelText: 'Average Time (mins)',
-                        border: OutlineInputBorder(),
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: experienceController,
-                      decoration: const InputDecoration(
-                        labelText: 'Experience (years)',
-                        border: OutlineInputBorder(),
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: costController,
-                      decoration: const InputDecoration(
-                        labelText: 'Cost (	8)',
-                        border: OutlineInputBorder(),
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: notesController,
-                      decoration: const InputDecoration(
-                        labelText: 'Notes (optional)',
-                        border: OutlineInputBorder(),
-                      ),
-                      maxLines: 2,
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (selectedService == null ||
-                    avgTimeController.text.isEmpty ||
-                    experienceController.text.isEmpty ||
-                    costController.text.isEmpty) {
-                  ScaffoldMessenger.of(this.context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please fill all required fields.'),
-                    ),
-                  );
-                  return;
-                }
-
-                final ServiceOffering service = ServiceOffering(
-                  id: DateTime.now().millisecondsSinceEpoch.toString(),
-                  name: selectedService!,
-                  averageTime: avgTimeController.text,
-                  experience: experienceController.text,
-                  cost: costController.text,
-                  notes: notesController.text,
-                );
-
-                final repo = ServiceRepository.instance;
-
-                try {
-                  await repo.addService(service);
-                  await _loadServices();
-                  ScaffoldMessenger.of(this.context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Service added successfully.'),
-                    ),
-                  );
-                  Navigator.of(context).pop();
-                } catch (e) {
-                  ScaffoldMessenger.of(this.context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Failed to add service. Please try again.'),
-                    ),
-                  );
-                }
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
+      initialService: null,
     );
+
+    if (newService == null) {
+      return;
+    }
+
+    final repo = ServiceRepository.instance;
+
+    try {
+      await repo.addService(newService);
+      await _loadServices();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Service added successfully.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to add service. Please try again.'),
+        ),
+      );
+    }
   }
 
   void _navigateToServices() {
@@ -284,13 +169,6 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.miscellaneous_services_outlined),
-            tooltip: 'Services I Offer',
-            onPressed: _navigateToServices,
-          ),
-        ],
       ),
 
       // ------------------ BODY ---------------------
@@ -513,9 +391,7 @@ class _SectionCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: const [
           BoxShadow(

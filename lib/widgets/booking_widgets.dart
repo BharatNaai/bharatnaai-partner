@@ -72,14 +72,12 @@ class BookingPillTab extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
-  final IconData icon;
 
   const BookingPillTab({
     super.key,
     required this.label,
     required this.isSelected,
     required this.onTap,
-    required this.icon,
   });
 
   @override
@@ -98,31 +96,21 @@ class BookingPillTab extends StatelessWidget {
           curve: Curves.easeOut,
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
-            gradient: isSelected
-                ? const LinearGradient(
-                    colors: [
-                      AppColors.loginPrimaryPurple,
-                      AppColors.primaryBlue,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  )
-                : null,
+            borderRadius: BorderRadius.circular(18),
             color: isSelected
-                ? null
-                : Colors.white.withOpacity(0.9),
+                ? AppColors.buttonPrimary
+                : AppColors.white,
             boxShadow: [
               if (isSelected)
                 const BoxShadow(
-                  color: Color(0x33185785),
+                  color: AppColors.primaryColor,
                   blurRadius: 18,
                   offset: Offset(0, 6),
                   spreadRadius: 1,
                 )
               else
                 const BoxShadow(
-                  color: Color(0x11000000),
+                  color: AppColors.white,
                   blurRadius: 10,
                   offset: Offset(0, 3),
                 ),
@@ -131,18 +119,13 @@ class BookingPillTab extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                size: 18,
-                color: isSelected ? Colors.white : AppColors.textGrey,
-              ),
               const SizedBox(width: 8),
               Text(
                 label,
                 style: textTheme.labelMedium?.copyWith(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: isSelected ? Colors.white : AppColors.textGrey,
+                  color: isSelected ? AppColors.white : AppColors.textGrey,
                 ),
               ),
               if (isSelected) ...[
@@ -152,7 +135,7 @@ class BookingPillTab extends StatelessWidget {
                   width: 16,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(999),
-                    color: Colors.white.withOpacity(0.85),
+                    color: AppColors.white.withOpacity(0.85),
                   ),
                 ),
               ],
@@ -194,10 +177,7 @@ class BookingFilterChip extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           gradient: isSelected
               ? const LinearGradient(
-                  colors: [
-                    AppColors.loginPrimaryPurple,
-                    AppColors.primaryBlue,
-                  ],
+                  colors: [AppColors.loginPrimaryPurple, AppColors.primaryBlue],
                 )
               : null,
           boxShadow: isSelected
@@ -221,7 +201,7 @@ class BookingFilterChip extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             color: isSelected
-                ? Colors.white.withOpacity(0.95)
+                ? AppColors.buttonPrimary
                 : AppColors.loginBackgroundEnd.withOpacity(0.9),
           ),
           child: Row(
@@ -230,19 +210,16 @@ class BookingFilterChip extends StatelessWidget {
               Icon(
                 icon,
                 size: 16,
-                color:
-                    isSelected ? AppColors.primaryBlue : AppColors.textGrey,
+                color: isSelected ? AppColors.white : AppColors.textGrey,
               ),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: textTheme.labelMedium?.copyWith(
                   fontSize: 13,
-                  fontWeight:
-                      isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isSelected
-                      ? AppColors.textPrimary
-                      : AppColors.loginSubtitleText,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  color:
+                      isSelected ? AppColors.white : AppColors.loginSubtitleText,
                 ),
               ),
             ],
@@ -284,10 +261,7 @@ class BookingCard extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: AppColors.lightGreyBackground,
-          border: Border.all(
-            color: AppColors.primaryColor,
-            width: 1,
-          ),
+          border: Border.all(color: AppColors.primaryColor, width: 1),
           borderRadius: BorderRadius.circular(18),
           boxShadow: const [
             BoxShadow(
@@ -306,8 +280,9 @@ class BookingCard extends StatelessWidget {
                 CircleAvatar(
                   radius: 20,
                   backgroundColor: AppColors.loginBackgroundStart,
-                  backgroundImage:
-                      booking.avatarUrl.isNotEmpty ? NetworkImage(booking.avatarUrl) : null,
+                  backgroundImage: booking.avatarUrl.isNotEmpty
+                      ? NetworkImage(booking.avatarUrl)
+                      : null,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -380,8 +355,11 @@ class BookingCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.calendar_today_outlined,
-                    size: 18, color: AppColors.primaryColor),
+                const Icon(
+                  Icons.calendar_today_outlined,
+                  size: 18,
+                  color: AppColors.primaryColor,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Row(
@@ -405,8 +383,11 @@ class BookingCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.location_on_outlined,
-                    size: 18, color: AppColors.primaryColor),
+                const Icon(
+                  Icons.location_on_outlined,
+                  size: 18,
+                  color: AppColors.primaryColor,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(
@@ -448,7 +429,7 @@ class BookingCard extends StatelessWidget {
                     child: CommonButton(
                       text: secondaryLabel!,
                       height: 44,
-                      backgroundColor: Colors.white,
+                      backgroundColor: AppColors.white,
                       textColor: AppColors.textSecondary,
                       onPressed: onSecondaryAction,
                     ),

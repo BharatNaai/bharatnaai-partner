@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:partner_app/core/constants/app_colors.dart';
 import 'package:partner_app/models/service_offering.dart';
 import 'package:partner_app/repositories/service_repository.dart';
+import 'package:partner_app/widgets/service_offering_dialog.dart';
 
 class ServicesOfferedScreen extends StatefulWidget {
   const ServicesOfferedScreen({super.key});
@@ -47,156 +48,32 @@ class _ServicesOfferedScreenState extends State<ServicesOfferedScreen> {
   }
 
   Future<void> _editService(ServiceOffering service) async {
-    final textTheme =
-        GoogleFonts.interTextTheme(Theme.of(context).textTheme);
-
-    String selectedService = service.name;
-    final TextEditingController avgTimeController =
-        TextEditingController(text: service.averageTime);
-    final TextEditingController experienceController =
-        TextEditingController(text: service.experience);
-    final TextEditingController costController =
-        TextEditingController(text: service.cost);
-    final TextEditingController notesController =
-        TextEditingController(text: service.notes);
-
-    await showDialog<void>(
+    final ServiceOffering? updated = await showServiceOfferingDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Text(
-            'Edit Service',
-            style: textTheme.titleMedium?.copyWith(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          content: StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-              return SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    DropdownButtonFormField<String>(
-                      value: selectedService,
-                      decoration: const InputDecoration(
-                        labelText: 'Service',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: kServiceOptions
-                          .map(
-                            (option) => DropdownMenuItem<String>(
-                              value: option,
-                              child: Text(option),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (String? value) {
-                        if (value == null) return;
-                        setState(() {
-                          selectedService = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: avgTimeController,
-                      decoration: const InputDecoration(
-                        labelText: 'Average Time (mins)',
-                        border: OutlineInputBorder(),
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: experienceController,
-                      decoration: const InputDecoration(
-                        labelText: 'Experience (years)',
-                        border: OutlineInputBorder(),
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: costController,
-                      decoration: const InputDecoration(
-                        labelText: 'Cost ()',
-                        border: OutlineInputBorder(),
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: notesController,
-                      decoration: const InputDecoration(
-                        labelText: 'Notes (optional)',
-                        border: OutlineInputBorder(),
-                      ),
-                      maxLines: 2,
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (avgTimeController.text.isEmpty ||
-                    experienceController.text.isEmpty ||
-                    costController.text.isEmpty) {
-                  ScaffoldMessenger.of(this.context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please fill all required fields.'),
-                    ),
-                  );
-                  return;
-                }
-
-                final updated = ServiceOffering(
-                  id: service.id,
-                  name: selectedService,
-                  averageTime: avgTimeController.text,
-                  experience: experienceController.text,
-                  cost: costController.text,
-                  notes: notesController.text,
-                );
-
-                final repo = ServiceRepository.instance;
-
-                try {
-                  await repo.updateService(updated);
-                  await _loadServices();
-                  ScaffoldMessenger.of(this.context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Service updated successfully.'),
-                    ),
-                  );
-                  Navigator.of(context).pop();
-                } catch (e) {
-                  ScaffoldMessenger.of(this.context).showSnackBar(
-                    const SnackBar(
-                      content:
-                          Text('Failed to update service. Please try again.'),
-                    ),
-                  );
-                }
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
+      initialService: service,
     );
+
+    if (updated == null) {
+      return;
+    }
+
+    final repo = ServiceRepository.instance;
+
+    try {
+      await repo.updateService(updated);
+      await _loadServices();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Service updated successfully.'),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to update service. Please try again.'),
+        ),
+      );
+    }
   }
 
   Future<void> _deleteService(ServiceOffering service) async {

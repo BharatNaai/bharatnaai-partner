@@ -18,7 +18,7 @@ class EarningsScreen extends StatelessWidget {
       backgroundColor: AppColors.loginBackgroundEnd,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         foregroundColor: AppColors.textPrimary,
         titleSpacing: 16,
         title: Text(
@@ -123,7 +123,7 @@ class _MainEarningsCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: const [
           BoxShadow(
@@ -140,12 +140,12 @@ class _MainEarningsCard extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: AppColors.loginPrimaryPurple,
+              color: AppColors.primaryColor,
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
               Icons.account_balance_wallet_outlined,
-              color: Colors.white,
+              color: AppColors.white,
               size: 22,
             ),
           ),
@@ -209,7 +209,7 @@ class _SummaryEarningCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
           BoxShadow(
@@ -226,10 +226,10 @@ class _SummaryEarningCard extends StatelessWidget {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: AppColors.loginPrimaryPurple,
+              color: AppColors.primaryColor,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: Colors.white, size: 18),
+            child: Icon(icon, color: AppColors.white, size: 18),
           ),
           const SizedBox(height: 8),
           Text(
@@ -270,7 +270,7 @@ class _PayoutCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: const [
           BoxShadow(
@@ -295,7 +295,7 @@ class _PayoutCard extends StatelessWidget {
                 ),
                 child: const Icon(
                   Icons.account_balance_outlined,
-                  color: Colors.white,
+                  color: AppColors.white,
                   size: 22,
                 ),
               ),
@@ -405,7 +405,7 @@ class _PayoutListItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: const [
             BoxShadow(

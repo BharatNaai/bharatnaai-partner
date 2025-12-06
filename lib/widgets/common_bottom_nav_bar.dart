@@ -13,6 +13,7 @@ class BottomNavItemConfig {
 const List<BottomNavItemConfig> kBottomNavItems = [
   BottomNavItemConfig(icon: Icons.home_outlined, label: 'Home'),
   BottomNavItemConfig(icon: Icons.event_note_outlined, label: 'Booking'),
+  BottomNavItemConfig(icon: Icons.miscellaneous_services_outlined, label: 'Services'),
   BottomNavItemConfig(icon: Icons.account_balance_wallet_outlined, label: 'Earning'),
   BottomNavItemConfig(icon: Icons.person_outline, label: 'Profile'),
 ];

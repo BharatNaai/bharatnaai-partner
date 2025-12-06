@@ -70,10 +70,6 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
             ),
           ],
         ),
-        actions: const [
-          Icon(Icons.search, color: AppColors.textPrimary),
-          SizedBox(width: 16),
-        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -90,7 +86,6 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
                     BookingPillTab(
                       label: 'Upcoming',
                       isSelected: _selectedMainStatus == BookingMainStatus.upcoming,
-                      icon: Icons.calendar_today_outlined,
                       onTap: () {
                         setState(() {
                           _selectedMainStatus = BookingMainStatus.upcoming;
@@ -101,7 +96,6 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
                     BookingPillTab(
                       label: 'Ongoing',
                       isSelected: _selectedMainStatus == BookingMainStatus.ongoing,
-                      icon: Icons.play_circle_outline,
                       onTap: () {
                         setState(() {
                           _selectedMainStatus = BookingMainStatus.ongoing;
@@ -112,7 +106,6 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
                     BookingPillTab(
                       label: 'Completed',
                       isSelected: _selectedMainStatus == BookingMainStatus.completed,
-                      icon: Icons.check_circle_outline,
                       onTap: () {
                         setState(() {
                           _selectedMainStatus = BookingMainStatus.completed;
