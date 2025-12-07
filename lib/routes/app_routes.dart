@@ -18,6 +18,9 @@ import 'package:partner_app/screens/profile_setup/profile_setup_step1.dart';
 import 'package:partner_app/screens/profile_setup/profile_setup_step2.dart';
 import 'package:partner_app/screens/profile_setup/profile_setup_step3.dart';
 import 'package:partner_app/screens/profile/barbers_profile.dart';
+import 'package:partner_app/screens/profile/personal_info_screen.dart';
+import 'package:partner_app/screens/profile/salon_info_screen.dart';
+import 'package:partner_app/screens/profile/bank_info_screen.dart';
 import 'package:partner_app/screens/services/services_offered_screen.dart';
 
 class AppRoutes {
@@ -194,6 +197,66 @@ class AppRoutes {
       case AppRoutes.settings:
         return MaterialPageRoute(
           builder: (_) => const SettingsScreen(),
+          settings: settings,
+        );
+
+      case '/personal-info':
+        return MaterialPageRoute(
+          builder: (_) => const PersonalInfoScreen(),
+          settings: settings,
+        );
+
+      case '/salon-info':
+        return MaterialPageRoute(
+          builder: (_) => const SalonInfoScreen(),
+          settings: settings,
+        );
+
+      case '/bank-info':
+        return MaterialPageRoute(
+          builder: (_) => const BankInfoScreen(),
+          settings: settings,
+        );
+
+      case '/bank/edit':
+        return MaterialPageRoute(
+          builder: (_) => const ProfileSetupStep2Screen(),
+          settings: settings,
+        );
+
+      case '/earnings':
+        return MaterialPageRoute(
+          builder: (_) => const _PlaceholderScreen(title: 'Earnings & Payouts'),
+          settings: settings,
+        );
+
+      case '/help':
+        return MaterialPageRoute(
+          builder: (_) => const _PlaceholderScreen(title: 'Help & Support'),
+          settings: settings,
+        );
+
+      case '/privacy':
+        return MaterialPageRoute(
+          builder: (_) => const _PlaceholderScreen(title: 'Privacy Policy'),
+          settings: settings,
+        );
+
+      case '/terms':
+        return MaterialPageRoute(
+          builder: (_) => const _PlaceholderScreen(title: 'Terms & Conditions'),
+          settings: settings,
+        );
+
+      case '/faqs':
+        return MaterialPageRoute(
+          builder: (_) => const _PlaceholderScreen(title: 'FAQs'),
+          settings: settings,
+        );
+
+      case '/how-it-works':
+        return MaterialPageRoute(
+          builder: (_) => const _PlaceholderScreen(title: 'How It Works'),
           settings: settings,
         );
 

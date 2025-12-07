@@ -13,6 +13,7 @@ class CommonTextField extends StatelessWidget {
   final bool obscureText;
   final int maxLines;
   final String? errorText;
+  final bool enabled;
 
   const CommonTextField({
     super.key,
@@ -26,6 +27,7 @@ class CommonTextField extends StatelessWidget {
     this.obscureText = false,
     this.maxLines = 1,
     this.errorText,
+    this.enabled = true,
   });
 
   @override
@@ -36,6 +38,7 @@ class CommonTextField extends StatelessWidget {
       obscureText: obscureText,
       keyboardType: keyboardType,
       maxLines: maxLines,
+      enabled: enabled,
       decoration: InputDecoration(
         labelText: labelText,
         errorText: errorText,
