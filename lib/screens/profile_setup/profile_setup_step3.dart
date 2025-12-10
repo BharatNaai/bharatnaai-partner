@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 import 'package:partner_app/core/constants/app_colors.dart';
 import 'package:partner_app/routes/app_routes.dart';
+import 'package:partner_app/providers/profile_setup_provider.dart';
 
 import '../../widgets/common_button.dart';
 import '../../widgets/upload_card.dart';
@@ -28,6 +30,36 @@ class _ProfileSetupStep3ScreenState extends State<ProfileSetupStep3Screen> {
 
   bool get _canComplete => _panFile != null && _aadhaarFrontFile != null && _aadhaarBackFile != null;
 
+  Future<void> _handleCompleteSetup() async {
+    final provider = context.read<ProfileSetupProvider>();
+    
+    // Save Step 3 data (documents) to provider
+    provider.saveStep3Data(
+      gstCertificate: _gstFile,
+      panCard: _panFile,
+      aadhaarFront: _aadhaarFrontFile,
+      aadhaarBack: _aadhaarBackFile,
+    );
+
+    // Submit profile to API
+    final success = await provider.submitProfile();
+
+    if (!mounted) return;
+
+    if (success) {
+      await _showCompletionDialog();
+    } else {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(provider.errorMessage ?? 'Failed to update profile'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
   Future<void> _showCompletionDialog() async {
     await AppDialogs.showPrimaryDialog(
       context: context,
@@ -35,6 +67,8 @@ class _ProfileSetupStep3ScreenState extends State<ProfileSetupStep3Screen> {
       message:
           'Document verification is in progress, and once approved you can start adding services and will begin receiving successful bookings.',
       onOk: () {
+        // Clear provider data after successful submission
+        context.read<ProfileSetupProvider>().clearData();
         AppRoutes.navigateToDashboard(context);
       },
     );
@@ -197,12 +231,18 @@ class _ProfileSetupStep3ScreenState extends State<ProfileSetupStep3Screen> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  Center(
-                    child: CommonButton(
-                      text: 'Complete Setup',
-                      onPressed: _canComplete ? _showCompletionDialog : null,
-                      width: double.infinity,
-                    ),
+                  Consumer<ProfileSetupProvider>(
+                    builder: (context, provider, child) {
+                      return Center(
+                        child: CommonButton(
+                          text: provider.isLoading ? 'Submitting...' : 'Complete Setup',
+                          onPressed: (_canComplete && !provider.isLoading) 
+                              ? _handleCompleteSetup 
+                              : null,
+                          width: double.infinity,
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 24),
                 ],

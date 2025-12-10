@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:partner_app/core/constants/app_colors.dart';
 import 'package:partner_app/routes/app_routes.dart';
 import 'package:partner_app/providers/location_provider.dart';
+import 'package:partner_app/providers/profile_setup_provider.dart';
 
 import '../../widgets/common_button.dart';
 import '../../widgets/common_text_field.dart';
@@ -304,10 +305,25 @@ class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
                     child: CommonButton(
                       text: 'Next →',
                       onPressed: _isFormValid
-                          ? () => Navigator.pushNamed(
-                                context,
-                                AppRoutes.profileStep2,
-                              )
+                          ? () {
+                              // Save Step 1 data to provider
+                              context.read<ProfileSetupProvider>().saveStep1Data(
+                                salonName: _salonNameController.text.trim(),
+                                businessType: _businessTypeController.text.trim(),
+                                address: _addressController.text.trim(),
+                                pincode: _pincodeController.text.trim(),
+                                city: _cityController.text.trim(),
+                                state: _stateController.text.trim(),
+                                country: _countryController.text.trim(),
+                                latitude: _latitudeController.text.trim().isNotEmpty 
+                                    ? _latitudeController.text.trim() 
+                                    : null,
+                                longitude: _longitudeController.text.trim().isNotEmpty 
+                                    ? _longitudeController.text.trim() 
+                                    : null,
+                              );
+                              Navigator.pushNamed(context, AppRoutes.profileStep2);
+                            }
                           : null,
                       width: double.infinity,
                     ),

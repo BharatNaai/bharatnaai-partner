@@ -32,25 +32,12 @@ class AuthProvider extends ChangeNotifier {
     _clearError();
 
     try {
-      // Dummy login path for offline backend development
-      if (phone == '1111111111' && password == '123456') {
-        await UserStorageService.saveBarberLoginSession(
-          accessToken: 'dummy_access_token',
-          refreshToken: 'dummy_refresh_token',
-          barberId: 'dummy_barber_id',
-        );
-
-        _userToken = 'dummy_access_token';
-        _isAuthenticated = true;
-        _setLoading(false);
-        return true;
-      }
-
       final deviceId = await DeviceInfoService.getDeviceId();
+
       final deviceInfo = DeviceInfo(
         deviceId: deviceId,
         appVersion: '1.0.0',
-        deviceType: Platform.isAndroid ? 'Android' : 'iOS',
+        deviceType: Platform.isAndroid ? 'android' : 'ios',
       );
 
       final request = BarberLoginRequest(
@@ -63,7 +50,7 @@ class AuthProvider extends ChangeNotifier {
 
       if (result['success'] == true) {
         final BarberLoginResponse loginResponse =
-            result['data'] as BarberLoginResponse;
+        result['data'] as BarberLoginResponse;
 
         await UserStorageService.saveBarberLoginSession(
           accessToken: loginResponse.accessToken,
@@ -73,16 +60,16 @@ class AuthProvider extends ChangeNotifier {
 
         _userToken = loginResponse.accessToken;
         _isAuthenticated = true;
+
         _setLoading(false);
         return true;
       } else {
-        final message = result['message'] as String? ?? 'Login failed';
-        _setError(message);
+        _setError(result['message'] ?? "Login failed");
         _setLoading(false);
         return false;
       }
     } catch (e) {
-      _setError('Login failed: $e');
+      _setError("Login failed: $e");
       _setLoading(false);
       return false;
     }

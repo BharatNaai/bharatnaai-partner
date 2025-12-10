@@ -9,9 +9,9 @@ class ValidationUtils {
     r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
   );
 
-  /// Phone number validation regex
+  /// Phone number validation regex - exactly 10 digits for Indian phone numbers
   static final RegExp _phoneRegex = RegExp(
-    r'^\+?[\d\s\-\(\)]{10,}$',
+    r'^\d{10}$',
   );
 
   /// Validate email address

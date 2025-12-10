@@ -10,6 +10,7 @@ import 'providers/navigation_provider.dart';
 import 'providers/welcome_provider.dart';
 import 'providers/location_provider.dart';
 import 'providers/earnings_provider.dart';
+import 'providers/profile_setup_provider.dart';
 
 // Global navigator key
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -55,6 +56,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
         ChangeNotifierProvider(create: (_) => LocationProvider()),
         ChangeNotifierProvider(create: (_) => EarningsProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileSetupProvider()),
       ],
       child: const MyApp(),
     ),

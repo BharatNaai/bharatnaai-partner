@@ -12,7 +12,7 @@ class BarberLoginRequest {
   });
 
   Map<String, dynamic> toJson() => {
-        'email': phone,
+        'phone': phone,
         'password': password,
         ...deviceInfo.toJson(),
       };

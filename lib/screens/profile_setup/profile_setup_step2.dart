@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import 'package:partner_app/core/constants/app_colors.dart';
 import 'package:partner_app/routes/app_routes.dart';
+import 'package:partner_app/providers/profile_setup_provider.dart';
 
 import '../../widgets/common_button.dart';
 import '../../widgets/common_text_field.dart';
@@ -116,7 +118,8 @@ class _ProfileSetupStep2ScreenState extends State<ProfileSetupStep2Screen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          // Skip bank setup, move to documents step
+                          // Skip bank setup - save empty/null values and move to documents step
+                          context.read<ProfileSetupProvider>().saveStep2Data();
                           Navigator.pushNamed(context, AppRoutes.profileStep3);
                         },
                         child: Text(
@@ -243,7 +246,16 @@ class _ProfileSetupStep2ScreenState extends State<ProfileSetupStep2Screen> {
                     child: CommonButton(
                       text: 'Next →',
                       onPressed: _isFormValid
-                          ? () => Navigator.pushNamed(context, AppRoutes.profileStep3)
+                          ? () {
+                              // Save Step 2 data to provider
+                              context.read<ProfileSetupProvider>().saveStep2Data(
+                                accountHolderName: _accountHolderController.text.trim(),
+                                bankName: _bankNameController.text.trim(),
+                                accountNumber: _accountNumberController.text.trim(),
+                                ifscCode: _ifscController.text.trim(),
+                              );
+                              Navigator.pushNamed(context, AppRoutes.profileStep3);
+                            }
                           : null,
                       width: double.infinity,
                     ),
