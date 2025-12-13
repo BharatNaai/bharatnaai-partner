@@ -47,15 +47,17 @@ class CommonBottomNavBar extends StatelessWidget {
               final item = kBottomNavItems[index];
               final bool isSelected = index == currentIndex;
 
-              return _BottomNavItem(
-                config: item,
-                isSelected: isSelected,
-                textTheme: textTheme,
-                onTap: () {
-                  if (!isSelected) {
-                    onTabSelected(index);
-                  }
-                },
+              return Flexible(
+                child: _BottomNavItem(
+                  config: item,
+                  isSelected: isSelected,
+                  textTheme: textTheme,
+                  onTap: () {
+                    if (!isSelected) {
+                      onTabSelected(index);
+                    }
+                  },
+                ),
               );
             }),
           ),

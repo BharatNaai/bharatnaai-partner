@@ -87,9 +87,8 @@ class ProfileSetupService {
       // Success case
       if (response.statusCode == 200 && decoded.isNotEmpty) {
         return {
-          'success': decoded['success'] ?? true,
+          'success': true, // Assuming success if status code is 200
           'message': decoded['message'] ?? 'Profile updated successfully',
-          'data': decoded['data'] ?? {},
         };
       }
 
