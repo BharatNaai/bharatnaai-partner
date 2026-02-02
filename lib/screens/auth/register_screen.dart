@@ -25,6 +25,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  
+  final _firstNameFocus = FocusNode();
+  final _phoneFocus = FocusNode();
+  final _emailFocus = FocusNode();
+  final _passwordFocus = FocusNode();
+  final _confirmPasswordFocus = FocusNode();
 
   @override
   void dispose() {
@@ -33,6 +39,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _firstNameFocus.dispose();
+    _phoneFocus.dispose();
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
+    _confirmPasswordFocus.dispose();
     super.dispose();
   }
 
@@ -103,10 +114,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 const SizedBox(height: 48),
 
-                // First Name Field
+                // Name Field
                 CommonTextField(
                   controller: _firstNameController,
-                  labelText: AppStrings.firstName,
+                  focusNode: _firstNameFocus,
+                  autofocus: true,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_phoneFocus),
+                  labelText: AppStrings.name,
+                  semanticLabel: "Enter your name, required",
                   prefixIcon: Icons.person_outlined,
                   validator: (value) => value == null || value.isEmpty
                       ? AppStrings.requiredField
@@ -118,7 +134,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 // Phone Number Field
                 CommonTextField(
                   controller: _phoneNumberController,
+                  focusNode: _phoneFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_emailFocus),
                   labelText: AppStrings.phoneNumber,
+                  semanticLabel: "Enter your phone number, required",
                   keyboardType: TextInputType.phone,
                   prefixIcon: Icons.person_outlined,
                   validator: (value) => value == null || value.isEmpty
@@ -131,7 +151,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 // Email Field
                 CommonTextField(
                   controller: _emailController,
+                  focusNode: _emailFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_passwordFocus),
                   labelText: AppStrings.email,
+                  semanticLabel: "Enter your email address, required",
                   prefixIcon: Icons.email_outlined,
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
@@ -150,7 +174,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 // Password Field
                 CommonTextField(
                   controller: _passwordController,
+                  focusNode: _passwordFocus,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_confirmPasswordFocus),
                   labelText: AppStrings.password,
+                  semanticLabel: "Enter a password",
                   prefixIcon: Icons.lock_outlined,
 
                   // password visibility toggle
@@ -163,6 +191,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       _obscurePassword = !_obscurePassword;
                     });
                   },
+                  suffixTooltip: _obscurePassword ? "Show password" : "Hide password",
 
                   // validator
                   validator: (value) {
@@ -182,7 +211,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 // Confirm Password Field
                 CommonTextField(
                   controller: _confirmPasswordController,
+                  focusNode: _confirmPasswordFocus,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) {
+                     // Since handleRegister doesn't take args, we just call it.
+                     // But ideally we might want to close keyboard.
+                     _handleRegister();
+                  },
                   labelText: AppStrings.confirmPassword,
+                  semanticLabel: "Confirm your password, required",
                   prefixIcon: Icons.lock_outlined,
 
                   // visibility toggle
@@ -195,6 +232,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       _obscureConfirmPassword = !_obscureConfirmPassword;
                     });
                   },
+                  suffixTooltip: _obscureConfirmPassword ? "Show password" : "Hide password",
 
                   // validator
                   validator: (value) {

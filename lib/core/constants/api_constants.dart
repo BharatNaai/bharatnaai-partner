@@ -1,7 +1,7 @@
 class ApiConstants {
   // Base URLs
-  static const String baseUrl = 'https://shakita-unlacquered-nakita.ngrok-free.dev/';
-  
+  static const String baseUrl = "http://bharatnaai.com/";
+
   // API Endpoints
   static const String login = 'barbers/login';
   static const String register = 'barbers/register';

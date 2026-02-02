@@ -28,6 +28,15 @@ class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
   final _latitudeController = TextEditingController();
   final _longitudeController = TextEditingController();
 
+  final _salonNameFocus = FocusNode();
+  final _addressFocus = FocusNode();
+  final _pincodeFocus = FocusNode();
+  final _cityFocus = FocusNode();
+  final _stateFocus = FocusNode();
+  final _countryFocus = FocusNode();
+  final _latFocus = FocusNode();
+  final _longFocus = FocusNode();
+
   bool get _isFormValid =>
       _salonNameController.text.trim().isNotEmpty &&
       _businessTypeController.text.trim().isNotEmpty &&
@@ -48,6 +57,14 @@ class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
     _countryController.dispose();
     _latitudeController.dispose();
     _longitudeController.dispose();
+    _salonNameFocus.dispose();
+    _addressFocus.dispose();
+    _pincodeFocus.dispose();
+    _cityFocus.dispose();
+    _stateFocus.dispose();
+    _countryFocus.dispose();
+    _latFocus.dispose();
+    _longFocus.dispose();
     super.dispose();
   }
 
@@ -196,7 +213,12 @@ class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
                   const SizedBox(height: 16),
                   CommonTextField(
                     controller: _salonNameController,
+                    focusNode: _salonNameFocus,
+                    autofocus: true,
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_addressFocus),
                     labelText: 'Salon Name',
+                    semanticLabel: "Enter salon name, required",
                     prefixIcon: Icons.storefront_outlined,
                     keyboardType: TextInputType.text,
                   ),
@@ -207,6 +229,7 @@ class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
                       child: CommonTextField(
                         controller: _businessTypeController,
                         labelText: 'Business Type',
+                        semanticLabel: "Business Type, tap to select, required",
                         prefixIcon: Icons.expand_more,
                       ),
                     ),
@@ -214,7 +237,11 @@ class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
                   const SizedBox(height: 12),
                   CommonTextField(
                     controller: _addressController,
+                    focusNode: _addressFocus,
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_pincodeFocus),
                     labelText: 'Address',
+                    semanticLabel: "Enter address, required",
                     keyboardType: TextInputType.streetAddress,
                   ),
                   const SizedBox(height: 12),
@@ -223,7 +250,11 @@ class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
                       Expanded(
                         child: CommonTextField(
                           controller: _pincodeController,
+                          focusNode: _pincodeFocus,
+                          textInputAction: TextInputAction.next,
+                          onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_cityFocus),
                           labelText: 'Pincode',
+                          semanticLabel: "Enter Pincode, required",
                           keyboardType: TextInputType.number,
                         ),
                       ),
@@ -231,7 +262,11 @@ class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
                       Expanded(
                         child: CommonTextField(
                           controller: _cityController,
+                          focusNode: _cityFocus,
+                          textInputAction: TextInputAction.next,
+                          onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_stateFocus),
                           labelText: 'City',
+                          semanticLabel: "Enter City, required",
                           keyboardType: TextInputType.text,
                         ),
                       ),
@@ -266,15 +301,23 @@ class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
                       Expanded(
                         child: CommonTextField(
                           controller: _stateController,
+                          focusNode: _stateFocus,
+                          textInputAction: TextInputAction.next,
+                          onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_countryFocus),
                           labelText: 'State',
-                          keyboardType: TextInputType.number,
+                          semanticLabel: "Enter State, required",
+                          keyboardType: TextInputType.text,
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: CommonTextField(
                           controller: _countryController,
+                          focusNode: _countryFocus,
+                          textInputAction: TextInputAction.next,
+                          onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_latFocus),
                           labelText: 'Country',
+                          semanticLabel: "Enter Country, required",
                           keyboardType: TextInputType.text,
                         ),
                       ),
@@ -286,16 +329,23 @@ class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
                       Expanded(
                         child: CommonTextField(
                           controller: _latitudeController,
+                          focusNode: _latFocus,
+                          textInputAction: TextInputAction.next,
+                          onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_longFocus),
                           labelText: 'Latitude',
-                          keyboardType: TextInputType.number,
+                          semanticLabel: "Enter Latitude",
+                          keyboardType: TextInputType.numberWithOptions(decimal: true),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: CommonTextField(
                           controller: _longitudeController,
+                          focusNode: _longFocus,
+                          textInputAction: TextInputAction.done,
                           labelText: 'Longitude',
-                          keyboardType: TextInputType.text,
+                          semanticLabel: "Enter Longitude",
+                          keyboardType: TextInputType.numberWithOptions(decimal: true),
                         ),
                       ),
                     ],

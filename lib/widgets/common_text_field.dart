@@ -5,6 +5,7 @@ import '../core/constants/app_colors.dart';
 class CommonTextField extends StatelessWidget {
   final TextEditingController controller;
   final String labelText;
+  final String? hintText;
   final IconData? prefixIcon;
   final IconData? suffixIcon;
   final VoidCallback? onSuffixTap;
@@ -14,11 +15,19 @@ class CommonTextField extends StatelessWidget {
   final int maxLines;
   final String? errorText;
   final bool enabled;
+  final FocusNode? focusNode;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onFieldSubmitted;
+  final String? semanticLabel;
+  final String? suffixTooltip;
+  final bool autofocus;
 
   const CommonTextField({
     super.key,
     required this.controller,
     required this.labelText,
+    this.autofocus = false,
+    this.hintText,
     this.prefixIcon,
     this.suffixIcon,
     this.onSuffixTap,
@@ -28,33 +37,52 @@ class CommonTextField extends StatelessWidget {
     this.maxLines = 1,
     this.errorText,
     this.enabled = true,
+    this.focusNode,
+    this.textInputAction,
+    this.onFieldSubmitted,
+    this.semanticLabel,
+    this.suffixTooltip,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      validator: validator,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      enabled: enabled,
-      decoration: InputDecoration(
-        labelText: labelText,
-        errorText: errorText,
-        prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
-        suffixIcon: suffixIcon != null
-            ? IconButton(icon: Icon(suffixIcon), onPressed: onSuffixTap)
-            : null,
-        floatingLabelStyle: const TextStyle(color: AppColors.primaryBlue),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Colors.grey),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.primaryBlue),
+    return Semantics(
+      label: semanticLabel,
+      container: true,
+      textField: true,
+      child: TextFormField(
+        controller: controller,
+        focusNode: focusNode,
+        autofocus: autofocus,
+        textInputAction: textInputAction,
+        onFieldSubmitted: onFieldSubmitted,
+        validator: validator,
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        maxLines: maxLines,
+        enabled: enabled,
+        decoration: InputDecoration(
+          labelText: labelText,
+          hintText: hintText,
+          errorText: errorText,
+          prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+          suffixIcon: suffixIcon != null
+              ? IconButton(
+                  icon: Icon(suffixIcon),
+                  onPressed: onSuffixTap,
+                  tooltip: suffixTooltip ?? (obscureText ? 'Show password' : 'Hide password'),
+                )
+              : null,
+          floatingLabelStyle: const TextStyle(color: AppColors.primaryBlue),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Colors.grey),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: AppColors.primaryBlue),
+          ),
         ),
       ),
     );

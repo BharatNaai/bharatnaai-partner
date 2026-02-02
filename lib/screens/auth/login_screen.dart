@@ -127,17 +127,23 @@ class _LoginScreenState extends State<LoginScreen>
     if (_phoneController.text.trim().isEmpty) {
       _phoneError = AppStrings.requiredField;
       isValid = false;
+      _phoneFocusNode.requestFocus();
     } else if (!ValidationUtils.isValidPhone(_phoneController.text.trim())) {
       _phoneError = AppStrings.invalidPhone;
       isValid = false;
+      _phoneFocusNode.requestFocus();
     }
     
-    if (_passwordController.text.isEmpty) {
-      _passwordError = AppStrings.requiredField;
-      isValid = false;
-    } else if (_passwordController.text.length < 6) {
-      _passwordError = AppStrings.passwordTooShort;
-      isValid = false;
+    if (isValid) {
+      if (_passwordController.text.isEmpty) {
+        _passwordError = AppStrings.requiredField;
+        isValid = false;
+        _passwordFocusNode.requestFocus();
+      } else if (_passwordController.text.length < 6) {
+        _passwordError = AppStrings.passwordTooShort;
+        isValid = false;
+        _passwordFocusNode.requestFocus();
+      }
     }
 
     if (!isValid) {
@@ -313,7 +319,12 @@ class _LoginScreenState extends State<LoginScreen>
 
     return CommonTextField(
       controller: _phoneController,
+      focusNode: _phoneFocusNode,
+      autofocus: true,
+      textInputAction: TextInputAction.next,
+      onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_passwordFocusNode),
       labelText: AppStrings.phoneNumber,
+      semanticLabel: "Enter your phone number, required",
       keyboardType: TextInputType.phone,
       prefixIcon: Icons.phone_outlined,
       errorText: _phoneError,
@@ -326,12 +337,17 @@ class _LoginScreenState extends State<LoginScreen>
   Widget _buildPasswordField() {
     return CommonTextField(
       controller: _passwordController,
+      focusNode: _passwordFocusNode,
+      textInputAction: TextInputAction.done,
+      onFieldSubmitted: (_) => _handleLogin(),
       labelText: AppStrings.password,
+      semanticLabel: "Enter your password, required",
       keyboardType: TextInputType.text,
       prefixIcon: Icons.lock_outlined,
       suffixIcon:
           _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
       onSuffixTap: () => setState(() => _obscurePassword = !_obscurePassword),
+      suffixTooltip: _obscurePassword ? "Show password" : "Hide password",
       obscureText: _obscurePassword,
       errorText: _passwordError,
       validator: (_) => _passwordError,

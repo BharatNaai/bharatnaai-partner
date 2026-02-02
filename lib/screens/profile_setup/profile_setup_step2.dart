@@ -22,6 +22,11 @@ class _ProfileSetupStep2ScreenState extends State<ProfileSetupStep2Screen> {
   final _accountNumberController = TextEditingController();
   final _confirmAccountNumberController = TextEditingController();
   final _ifscController = TextEditingController(text: 'SBIN000000');
+  
+  final _holderFocus = FocusNode();
+  final _accNumFocus = FocusNode();
+  final _confirmAccFocus = FocusNode();
+  final _ifscFocus = FocusNode();
 
   bool get _isFormValid =>
       _accountHolderController.text.trim().isNotEmpty &&
@@ -39,6 +44,10 @@ class _ProfileSetupStep2ScreenState extends State<ProfileSetupStep2Screen> {
     _accountNumberController.dispose();
     _confirmAccountNumberController.dispose();
     _ifscController.dispose();
+    _holderFocus.dispose();
+    _accNumFocus.dispose();
+    _confirmAccFocus.dispose();
+    _ifscFocus.dispose();
     super.dispose();
   }
 
@@ -167,7 +176,12 @@ class _ProfileSetupStep2ScreenState extends State<ProfileSetupStep2Screen> {
                   const SizedBox(height: 16),
                   CommonTextField(
                     controller: _accountHolderController,
+                    focusNode: _holderFocus,
+                    autofocus: true,
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_accNumFocus),
                     labelText: 'Account Holder Name',
+                    semanticLabel: "Enter Account Holder Name, required",
                     prefixIcon: Icons.person_outline,
                   ),
                   const SizedBox(height: 12),
@@ -177,6 +191,7 @@ class _ProfileSetupStep2ScreenState extends State<ProfileSetupStep2Screen> {
                       child: CommonTextField(
                         controller: _bankNameController,
                         labelText: 'Bank Name',
+                        semanticLabel: "Bank Name, tap to select, required",
                         prefixIcon: Icons.account_balance_outlined,
                       ),
                     ),
@@ -184,14 +199,22 @@ class _ProfileSetupStep2ScreenState extends State<ProfileSetupStep2Screen> {
                   const SizedBox(height: 12),
                   CommonTextField(
                     controller: _accountNumberController,
+                    focusNode: _accNumFocus,
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_confirmAccFocus),
                     labelText: 'Account Number',
+                    semanticLabel: "Enter Account Number, required",
                     prefixIcon: Icons.credit_card_outlined,
                     keyboardType: TextInputType.number,
                   ),
                   const SizedBox(height: 12),
                   CommonTextField(
                     controller: _confirmAccountNumberController,
+                    focusNode: _confirmAccFocus,
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_ifscFocus),
                     labelText: 'Confirm Account Number',
+                    semanticLabel: "Confirm Account Number, required",
                     prefixIcon: Icons.credit_card_outlined,
                     keyboardType: TextInputType.number,
                   ),
@@ -201,7 +224,10 @@ class _ProfileSetupStep2ScreenState extends State<ProfileSetupStep2Screen> {
                       Expanded(
                         child: CommonTextField(
                           controller: _ifscController,
+                          focusNode: _ifscFocus,
+                          textInputAction: TextInputAction.done,
                           labelText: 'IFSC Code',
+                          semanticLabel: "Enter IFSC Code, required",
                           prefixIcon: Icons.numbers_outlined,
                         ),
                       ),

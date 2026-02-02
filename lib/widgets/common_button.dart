@@ -53,36 +53,39 @@ class CommonButton extends StatelessWidget {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: isLoading
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  if (icon != null) ...[
-                    Icon(icon, size: 20, color: textColor ?? AppColors.white),
-                    const SizedBox(width: 8),
-                  ],
-                  Expanded(
-                    child: Text(
-                      disableText.isNotEmpty ? disableText : "Verifying...",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
-                        fontSize: fontSize,
-                        fontWeight: fontWeight,
-                        color: textColor ?? AppColors.white,
+            ? Semantics(
+                label: "Loading, please wait",
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 12),
+                    if (icon != null) ...[
+                      Icon(icon, size: 20, color: textColor ?? AppColors.white),
+                      const SizedBox(width: 8),
+                    ],
+                    Expanded(
+                      child: Text(
+                        disableText.isNotEmpty ? disableText : "Verifying...",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          fontSize: fontSize,
+                          fontWeight: fontWeight,
+                          color: textColor ?? AppColors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,

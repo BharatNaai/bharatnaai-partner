@@ -24,6 +24,11 @@ Future<ServiceOffering?> showServiceOfferingDialog({
   final TextEditingController notesController = TextEditingController(
     text: initialService?.notes ?? '',
   );
+  
+  final FocusNode timeFocus = FocusNode();
+  final FocusNode expFocus = FocusNode();
+  final FocusNode costFocus = FocusNode();
+  final FocusNode notesFocus = FocusNode();
 
   return showDialog<ServiceOffering?>(
     context: context,
@@ -91,7 +96,12 @@ Future<ServiceOffering?> showServiceOfferingDialog({
                       const SizedBox(height: 12),
                       CommonTextField(
                         controller: avgTimeController,
+                        focusNode: timeFocus,
+                        autofocus: true,
+                        textInputAction: TextInputAction.next,
+                        onFieldSubmitted: (_) => FocusScope.of(dialogContext).requestFocus(expFocus),
                         labelText: 'Average Time (mins)',
+                        semanticLabel: "Enter average time in minutes, required",
                         keyboardType: TextInputType.number,
                         prefixIcon: Icons.timer_outlined,
                         obscureText: false,
@@ -100,7 +110,11 @@ Future<ServiceOffering?> showServiceOfferingDialog({
                       const SizedBox(height: 12),
                       CommonTextField(
                         controller: experienceController,
+                        focusNode: expFocus,
+                        textInputAction: TextInputAction.next,
+                        onFieldSubmitted: (_) => FocusScope.of(dialogContext).requestFocus(costFocus),
                         labelText: 'Experience (years)',
+                        semanticLabel: "Enter experience in years, required",
                         keyboardType: TextInputType.number,
                         prefixIcon: Icons.work_outline,
                         obscureText: false,
@@ -109,7 +123,11 @@ Future<ServiceOffering?> showServiceOfferingDialog({
                       const SizedBox(height: 12),
                       CommonTextField(
                         controller: costController,
+                        focusNode: costFocus,
+                        textInputAction: TextInputAction.next,
+                        onFieldSubmitted: (_) => FocusScope.of(dialogContext).requestFocus(notesFocus),
                         labelText: 'Cost',
+                        semanticLabel: "Enter Cost, required",
                         keyboardType: TextInputType.number,
                         prefixIcon: Icons.currency_rupee_outlined,
                         obscureText: false,
@@ -118,7 +136,10 @@ Future<ServiceOffering?> showServiceOfferingDialog({
                       const SizedBox(height: 12),
                       CommonTextField(
                         controller: notesController,
+                        focusNode: notesFocus,
+                        textInputAction: TextInputAction.done,
                         labelText: 'Notes (optional)',
+                        semanticLabel: "Enter Notes, optional",
                         keyboardType: TextInputType.text,
                         prefixIcon: Icons.note_outlined,
                         obscureText: false,

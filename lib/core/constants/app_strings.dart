@@ -18,6 +18,7 @@ class AppStrings {
   static const String password = 'Password';
   static const String confirmPassword = 'Confirm Password';
   static const String firstName = 'First Name';
+  static const String name = 'Name';
   static const String lastName = 'Last Name';
   static const String otpVerificationTitle = 'OTP verification';
   static const String otpVerification = 'Verify & Continue';
