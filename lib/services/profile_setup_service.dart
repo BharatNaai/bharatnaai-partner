@@ -10,11 +10,11 @@ class ProfileSetupService {
       ProfileSetupRequest data,
       ) async {
     final url = Uri.parse(
-      '${ApiConstants.baseUrl}${ApiConstants.updateBarber}?barberId=$barberId',
+      '${ApiConstants.baseUrl}${ApiConstants.register}?barberId=$barberId',
     );
 
     try {
-      final request = http.MultipartRequest('POST', url);
+      final request = http.MultipartRequest('PUT', url);
 
       // Required headers
       request.headers['Accept'] = 'application/json';
@@ -85,9 +85,9 @@ class ProfileSetupService {
       final decoded = safeDecode(response.body);
 
       // Success case
-      if (response.statusCode == 200 && decoded.isNotEmpty) {
+      if ((response.statusCode == 200 || response.statusCode == 201) && decoded.isNotEmpty) {
         return {
-          'success': true, // Assuming success if status code is 200
+          'success': decoded['success'] ?? true, 
           'message': decoded['message'] ?? 'Profile updated successfully',
         };
       }

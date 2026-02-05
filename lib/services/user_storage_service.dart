@@ -11,6 +11,7 @@ class UserStorageService {
   static const String _isLoggedInKey = 'is_logged_in';
   static const String _refreshTokenKey = 'refresh_token';
   static const String _barberIdKey = 'barber_id';
+  static const String _isProfileCompletedKey = 'is_profile_completed';
 
   // Callback for when user data is cleared
   static VoidCallback? _onDataCleared;
@@ -154,6 +155,7 @@ class UserStorageService {
     await prefs.remove(_accessTokenKey);
     await prefs.remove(_refreshTokenKey);
     await prefs.remove(_barberIdKey);
+    await prefs.remove(_isProfileCompletedKey);
     await prefs.setBool(_isLoggedInKey, false);
     debugPrint('UserStorageService: All user data cleared');
 
@@ -187,6 +189,16 @@ class UserStorageService {
   static Future<String?> getBarberId() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_barberIdKey);
+  }
+
+  static Future<void> saveProfileCompletionStatus(bool completed) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_isProfileCompletedKey, completed);
+  }
+
+  static Future<bool> getProfileCompletionStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_isProfileCompletedKey) ?? false;
   }
 
   // Get user email

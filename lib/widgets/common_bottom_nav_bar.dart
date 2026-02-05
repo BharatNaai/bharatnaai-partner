@@ -32,34 +32,37 @@ class CommonBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = GoogleFonts.interTextTheme(Theme.of(context).textTheme);
 
-    return SizedBox(
-      height: 80,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        child: Material(
-          color: Colors.white,
-          elevation: 10,
-          shadowColor: const Color(0x10182840),
-          borderRadius: BorderRadius.circular(28),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(kBottomNavItems.length, (index) {
-              final item = kBottomNavItems[index];
-              final bool isSelected = index == currentIndex;
+    return SafeArea(
+      bottom: true,
+      child: SizedBox(
+        height: 72,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Material(
+            color: Colors.white,
+            elevation: 10,
+            shadowColor: const Color(0x10182840),
+            borderRadius: BorderRadius.circular(28),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(kBottomNavItems.length, (index) {
+                final item = kBottomNavItems[index];
+                final bool isSelected = index == currentIndex;
 
-              return Flexible(
-                child: _BottomNavItem(
-                  config: item,
-                  isSelected: isSelected,
-                  textTheme: textTheme,
-                  onTap: () {
-                    if (!isSelected) {
-                      onTabSelected(index);
-                    }
-                  },
-                ),
-              );
-            }),
+                return Flexible(
+                  child: _BottomNavItem(
+                    config: item,
+                    isSelected: isSelected,
+                    textTheme: textTheme,
+                    onTap: () {
+                      if (!isSelected) {
+                        onTabSelected(index);
+                      }
+                    },
+                  ),
+                );
+              }),
+            ),
           ),
         ),
       ),

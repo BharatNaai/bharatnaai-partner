@@ -67,11 +67,7 @@ class WelcomeSuccessScreen extends StatelessWidget {
               CommonButton(
                 text: 'Login To Get Started',
                 onPressed: () {
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    AppRoutes.login,
-                    (route) => false,
-                  );
+                  AppRoutes.navigateToLogin(context);
                 },
               ),
 

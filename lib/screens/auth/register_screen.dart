@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:partner_app/core/constants/app_colors.dart';
 import 'package:partner_app/core/constants/app_strings.dart';
@@ -172,38 +173,55 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 16),
 
                 // Password Field
-                CommonTextField(
-                  controller: _passwordController,
-                  focusNode: _passwordFocus,
-                  textInputAction: TextInputAction.next,
-                  onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_confirmPasswordFocus),
-                  labelText: AppStrings.password,
-                  semanticLabel: "Enter a password",
-                  prefixIcon: Icons.lock_outlined,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CommonTextField(
+                      controller: _passwordController,
+                      focusNode: _passwordFocus,
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_confirmPasswordFocus),
+                      labelText: AppStrings.password,
+                      semanticLabel: "Enter a password",
+                      prefixIcon: Icons.lock_outlined,
 
-                  // password visibility toggle
-                  obscureText: _obscurePassword,
-                  suffixIcon: _obscurePassword
-                      ? Icons.visibility
-                      : Icons.visibility_off,
-                  onSuffixTap: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                  suffixTooltip: _obscurePassword ? "Show password" : "Hide password",
+                      // password visibility toggle
+                      obscureText: _obscurePassword,
+                      suffixIcon: _obscurePassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      onSuffixTap: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                      suffixTooltip: _obscurePassword ? "Show password" : "Hide password",
 
-                  // validator
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return AppStrings.requiredField;
-                    }
-                    final errors = ValidationUtils.getPasswordErrors(value);
-                    if (errors.isNotEmpty) {
-                      return errors.first;
-                    }
-                    return null;
-                  },
+                      // validator
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return AppStrings.requiredField;
+                        }
+                        final errors = ValidationUtils.getPasswordErrors(value);
+                        if (errors.isNotEmpty) {
+                          return errors.first;
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 6),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: Text(
+                        'Password must be 8+ characters with uppercase, lowercase, number, and special character.',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: AppColors.loginSubtitleText,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
 
                 const SizedBox(height: 16),

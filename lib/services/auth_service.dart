@@ -81,4 +81,34 @@ class AuthService {
       };
     }
   }
+
+  Future<Map<String, dynamic>> getBarberDetails(String barberId) async {
+    final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.barberDetails}?barberId=$barberId');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: ApiConstants.defaultHeaders,
+      );
+
+      final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 200 && (decoded['success'] == true)) {
+        return {
+          'success': true,
+          'data': decoded['data'],
+        };
+      } else {
+        return {
+          'success': false,
+          'message': decoded['message'] ?? 'Failed to fetch barber details',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Something went wrong: $e',
+      };
+    }
+  }
 }

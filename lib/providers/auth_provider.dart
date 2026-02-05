@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:partner_app/models/barber_register_request.dart';
 import 'package:partner_app/models/barber_login_request.dart';
 import 'package:partner_app/models/barber_login_response.dart';
+import 'package:partner_app/models/barber_model.dart';
 import 'package:partner_app/models/device_info.dart';
 import 'package:partner_app/services/auth_service.dart';
 import 'package:partner_app/services/device_info_service.dart';
@@ -13,18 +14,30 @@ class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
 
   bool _isAuthenticated = false;
+  bool _isProfileCompleted = false;
   bool _isLoading = false;
+  BarberModel? _barberData;
   String? _userToken;
   String? _errorMessage;
 
   // Getters
   bool get isAuthenticated => _isAuthenticated;
 
+  bool get isProfileCompleted => _isProfileCompleted;
+
   bool get isLoading => _isLoading;
+
+  BarberModel? get barberData => _barberData;
 
   String? get userToken => _userToken;
 
   String? get errorMessage => _errorMessage;
+
+  void setProfileCompleted(bool value) {
+    _isProfileCompleted = value;
+    UserStorageService.saveProfileCompletionStatus(value);
+    notifyListeners();
+  }
 
   // Login method
   Future<bool> login(String phone, String password) async {
@@ -129,6 +142,8 @@ class AuthProvider extends ChangeNotifier {
 
       _userToken = null;
       _isAuthenticated = false;
+      _isProfileCompleted = false;
+      await UserStorageService.clearUserData();
       _clearError();
     } catch (e) {
       _setError('Logout failed: $e');
@@ -171,9 +186,35 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> fetchBarberDetails() async {
+    final barberId = await UserStorageService.getBarberId();
+    if (barberId == null) return;
+
+    _setLoading(true);
+    try {
+      final result = await _authService.getBarberDetails(barberId);
+      if (result['success'] == true) {
+        _barberData = BarberModel.fromJson(result['data']);
+        _isProfileCompleted = _barberData?.isVerified ?? false;
+        notifyListeners();
+      } else {
+        _setError(result['message'] ?? "Failed to load barber details");
+      }
+    } catch (e) {
+      _setError("Error: $e");
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   // Check if user is already logged in (e.g., from stored token)
   Future<void> checkAuthStatus() async {
-    // TODO: Check stored token and validate with server
-    // This is typically called on app startup
+    final isLoggedIn = await UserStorageService.isBarberLoggedIn();
+    if (isLoggedIn) {
+      _isAuthenticated = true;
+      _userToken = await UserStorageService.getAccessToken();
+      await fetchBarberDetails();
+      notifyListeners();
+    }
   }
 }

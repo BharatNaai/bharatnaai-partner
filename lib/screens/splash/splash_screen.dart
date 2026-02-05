@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:partner_app/core/constants/app_colors.dart';
 import 'package:partner_app/core/constants/app_strings.dart';
+import 'package:partner_app/providers/auth_provider.dart';
 import 'package:partner_app/routes/app_routes.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -56,9 +58,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Start animations
     _startAnimations();
-
-    // Navigate to welcome screen after delay
-    _navigateToWelcome();
+    _handleNavigation();
   }
 
   void _startAnimations() async {
@@ -74,10 +74,20 @@ class _SplashScreenState extends State<SplashScreen>
     _glowController.repeat(reverse: true);
   }
 
-  void _navigateToWelcome() async {
-    await Future.delayed(const Duration(milliseconds: 3000));
+  void _handleNavigation() async {
+    // Check auth status while animations are playing
+    final authProvider = context.read<AuthProvider>();
+    await authProvider.checkAuthStatus();
+    
+    // Total splash time at least 1500ms
+    await Future.delayed(const Duration(milliseconds: 1500));
+    
     if (mounted) {
-      Navigator.pushReplacementNamed(context, AppRoutes.welcome);
+      if (authProvider.isAuthenticated) {
+        Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+      } else {
+        Navigator.pushReplacementNamed(context, AppRoutes.welcome);
+      }
     }
   }
 

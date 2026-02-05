@@ -282,6 +282,10 @@ class AppRoutes {
     Navigator.pushNamedAndRemoveUntil(context, welcome, (route) => false);
   }
 
+  static void navigateToRegister(BuildContext context){
+    Navigator.pushNamedAndRemoveUntil(context, register, (route) => false);
+  }
+
   static Future<T?> navigateTo<T extends Object?>(
       BuildContext context, String routeName,
       {Object? arguments}) {

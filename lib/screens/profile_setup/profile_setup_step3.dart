@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:partner_app/core/constants/app_colors.dart';
 import 'package:partner_app/routes/app_routes.dart';
 import 'package:partner_app/providers/profile_setup_provider.dart';
+import 'package:partner_app/providers/auth_provider.dart';
 
 import '../../widgets/common_button.dart';
 import '../../widgets/upload_card.dart';
@@ -47,6 +48,10 @@ class _ProfileSetupStep3ScreenState extends State<ProfileSetupStep3Screen> {
     if (!mounted) return;
 
     if (success) {
+      // Mark profile as completed in AuthProvider
+      if (mounted) {
+        context.read<AuthProvider>().setProfileCompleted(true);
+      }
       await _showCompletionDialog();
     } else {
       // Show error message

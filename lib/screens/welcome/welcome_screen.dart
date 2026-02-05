@@ -133,12 +133,12 @@ class WelcomeScreen extends StatelessWidget {
               CommonButton(
                 text: AppStrings.loginButton,
                 onPressed: () {
-                  Navigator.pushNamed(context, AppRoutes.login);
+                 AppRoutes.navigateToLogin(context);
                 },
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, AppRoutes.register);
+                AppRoutes.navigateToRegister(context);
                 },
                 child: Text(
                   AppStrings.signupButton,

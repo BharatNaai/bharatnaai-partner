@@ -230,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen>
                     
                     // Title
                     Text(
-                      AppStrings.barberPartnerApp,
+                      AppStrings.bharatnaaiPartner,
                       style: GoogleFonts.inter(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
@@ -335,23 +335,40 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Widget _buildPasswordField() {
-    return CommonTextField(
-      controller: _passwordController,
-      focusNode: _passwordFocusNode,
-      textInputAction: TextInputAction.done,
-      onFieldSubmitted: (_) => _handleLogin(),
-      labelText: AppStrings.password,
-      semanticLabel: "Enter your password, required",
-      keyboardType: TextInputType.text,
-      prefixIcon: Icons.lock_outlined,
-      suffixIcon:
-          _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-      onSuffixTap: () => setState(() => _obscurePassword = !_obscurePassword),
-      suffixTooltip: _obscurePassword ? "Show password" : "Hide password",
-      obscureText: _obscurePassword,
-      errorText: _passwordError,
-      validator: (_) => _passwordError,
-      maxLines: 1,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CommonTextField(
+          controller: _passwordController,
+          focusNode: _passwordFocusNode,
+          textInputAction: TextInputAction.done,
+          onFieldSubmitted: (_) => _handleLogin(),
+          labelText: AppStrings.password,
+          semanticLabel: "Enter your password, required",
+          keyboardType: TextInputType.text,
+          prefixIcon: Icons.lock_outlined,
+          suffixIcon:
+              _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+          onSuffixTap: () => setState(() => _obscurePassword = !_obscurePassword),
+          suffixTooltip: _obscurePassword ? "Show password" : "Hide password",
+          obscureText: _obscurePassword,
+          errorText: _passwordError,
+          validator: (_) => _passwordError,
+          maxLines: 1,
+        ),
+        const SizedBox(height: 6),
+        Padding(
+          padding: const EdgeInsets.only(left: 4),
+          child: Text(
+            'Password follows 8+ characters with uppercase, lowercase, number, and special character.',
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: AppColors.loginSubtitleText,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

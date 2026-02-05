@@ -14,20 +14,32 @@ class BookingsListScreen extends StatefulWidget {
   State<BookingsListScreen> createState() => _BookingsListScreenState();
 }
 
-class _BookingsListScreenState extends State<BookingsListScreen> {
+class _BookingsListScreenState extends State<BookingsListScreen>
+    with SingleTickerProviderStateMixin {
   late List<Booking> _bookings;
+  late TabController _tabController;
   BookingMainStatus _selectedMainStatus = BookingMainStatus.upcoming;
 
   @override
   void initState() {
     super.initState();
     _bookings = List<Booking>.from(kMockBookings);
+    _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(_handleTabSelection);
   }
 
-  List<Booking> get _filteredBookings {
-    return _bookings
-        .where((b) => b.mainStatus == _selectedMainStatus)
-        .toList();
+  @override
+  void dispose() {
+    _tabController.removeListener(_handleTabSelection);
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  void _handleTabSelection() {
+    if (_tabController.indexIsChanging) return;
+    setState(() {
+      _selectedMainStatus = BookingMainStatus.values[_tabController.index];
+    });
   }
 
   void _updateBooking(Booking updated) {
@@ -36,6 +48,10 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
           .map((b) => b.id == updated.id ? updated : b)
           .toList(growable: false);
     });
+  }
+
+  List<Booking> _getBookingsByStatus(BookingMainStatus status) {
+    return _bookings.where((b) => b.mainStatus == status).toList();
   }
 
   @override
@@ -71,126 +87,146 @@ class _BookingsListScreenState extends State<BookingsListScreen> {
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-              child: SizedBox(
-                height: 44,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  children: [
-                    BookingPillTab(
-                      label: 'Upcoming',
-                      isSelected: _selectedMainStatus == BookingMainStatus.upcoming,
-                      onTap: () {
-                        setState(() {
-                          _selectedMainStatus = BookingMainStatus.upcoming;
-                        });
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    BookingPillTab(
-                      label: 'Ongoing',
-                      isSelected: _selectedMainStatus == BookingMainStatus.ongoing,
-                      onTap: () {
-                        setState(() {
-                          _selectedMainStatus = BookingMainStatus.ongoing;
-                        });
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    BookingPillTab(
-                      label: 'Completed',
-                      isSelected: _selectedMainStatus == BookingMainStatus.completed,
-                      onTap: () {
-                        setState(() {
-                          _selectedMainStatus = BookingMainStatus.completed;
-                        });
-                      },
-                    ),
-                  ],
-                ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Pills Tab Bar
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            child: SizedBox(
+              height: 44,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                children: [
+                  BookingPillTab(
+                    label: 'Upcoming',
+                    isSelected: _selectedMainStatus == BookingMainStatus.upcoming,
+                    onTap: () => _tabController.animateTo(0),
+                  ),
+                  const SizedBox(width: 8),
+                  BookingPillTab(
+                    label: 'Ongoing',
+                    isSelected: _selectedMainStatus == BookingMainStatus.ongoing,
+                    onTap: () => _tabController.animateTo(1),
+                  ),
+                  const SizedBox(width: 8),
+                  BookingPillTab(
+                    label: 'Completed',
+                    isSelected: _selectedMainStatus == BookingMainStatus.completed,
+                    onTap: () => _tabController.animateTo(2),
+                  ),
+                ],
               ),
             ),
-            Column(
-              children: _filteredBookings.map((booking) {
-                return Padding(
-                  padding: const EdgeInsets.only(
-                    left: 12,
-                    right: 12,
-                    top: 12,
-                    bottom: 12,
-                  ),
+          ),
+          
+          // Swipeable List
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildBookingList(BookingMainStatus.upcoming),
+                _buildBookingList(BookingMainStatus.ongoing),
+                _buildBookingList(BookingMainStatus.completed),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-                  child: BookingCard(
-                    booking: booking,
-                    primaryLabel: booking.mainStatus == BookingMainStatus.ongoing
-                        ? 'Start Service'
-                        : booking.mainStatus == BookingMainStatus.completed
-                        ? 'View Details'
-                        : 'Accept',
-                    secondaryLabel: booking.mainStatus == BookingMainStatus.ongoing
-                        ? 'Mark As Completed'
-                        : booking.mainStatus == BookingMainStatus.upcoming
-                        ? 'Reject'
-                        : null,
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        AppRoutes.booking,
-                        arguments: booking,
-                      );
-                    },
-                    onPrimaryAction: () {
-                      if (booking.mainStatus == BookingMainStatus.upcoming) {
-                        _updateBooking(
-                          booking.copyWith(
-                            actionStatus: BookingActionStatus.confirmed,
-                          ),
-                        );
-                      } else if (booking.mainStatus == BookingMainStatus.ongoing) {
+  Widget _buildBookingList(BookingMainStatus status) {
+    final bookings = _getBookingsByStatus(status);
+    
+    if (bookings.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.event_busy, size: 48, color: Colors.grey[300]),
+            const SizedBox(height: 12),
+            Text(
+              'No ${status.name} bookings',
+              style: GoogleFonts.inter(
+                color: Colors.grey[500],
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.only(bottom: 24),
+      itemCount: bookings.length,
+      itemBuilder: (context, index) {
+        final booking = bookings[index];
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: BookingCard(
+            booking: booking,
+            primaryLabel: booking.mainStatus == BookingMainStatus.ongoing
+                ? 'Start Service'
+                : booking.mainStatus == BookingMainStatus.completed
+                ? 'View Details'
+                : 'Accept',
+            secondaryLabel: booking.mainStatus == BookingMainStatus.ongoing
+                ? 'Mark As Completed'
+                : booking.mainStatus == BookingMainStatus.upcoming
+                ? 'Reject'
+                : null,
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                AppRoutes.booking,
+                arguments: booking,
+              );
+            },
+            onPrimaryAction: () {
+              if (booking.mainStatus == BookingMainStatus.upcoming) {
+                _updateBooking(
+                  booking.copyWith(
+                    actionStatus: BookingActionStatus.confirmed,
+                  ),
+                );
+              } else if (booking.mainStatus == BookingMainStatus.ongoing) {
+                _updateBooking(
+                  booking.copyWith(
+                    mainStatus: BookingMainStatus.completed,
+                  ),
+                );
+              }
+            },
+            onSecondaryAction: booking.mainStatus == BookingMainStatus.upcoming
+                ? () {
+                    _updateBooking(
+                      booking.copyWith(
+                        actionStatus: BookingActionStatus.rejected,
+                      ),
+                    );
+                  }
+                : booking.mainStatus == BookingMainStatus.ongoing
+                    ? () {
                         _updateBooking(
                           booking.copyWith(
                             mainStatus: BookingMainStatus.completed,
                           ),
                         );
                       }
-                    },
-                    onSecondaryAction: booking.mainStatus == BookingMainStatus.upcoming
-                        ? () {
-                            _updateBooking(
-                              booking.copyWith(
-                                actionStatus: BookingActionStatus.rejected,
-                              ),
-                            );
-                          }
-                        : booking.mainStatus == BookingMainStatus.ongoing
-                            ? () {
-                                _updateBooking(
-                                  booking.copyWith(
-                                    mainStatus: BookingMainStatus.completed,
-                                  ),
-                                );
-                              }
-                            : null,
-                    onPhoneTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Calling customer...'),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-      ),
+                    : null,
+            onPhoneTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Calling customer...'),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

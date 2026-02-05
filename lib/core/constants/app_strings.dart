@@ -104,7 +104,7 @@ class AppStrings {
   static const String signupButton = "Sign up";
 
   // Login Screen Specific
-  static const String barberPartnerApp = "Barber Partner App";
+  static const String bharatnaaiPartner = "Bharatnaai Partner";
   static const String empoweringSalonProfessionals =
       "Empowering Salon Professionals";
   static const String dontHaveAccount = "Don't have an account? ";

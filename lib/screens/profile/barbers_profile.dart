@@ -1,15 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:partner_app/models/barber_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../routes/app_routes.dart';
-import '../../widgets/common_bottom_nav_bar.dart';
 import '../../widgets/common_button.dart';
 
-class BarbersProfileScreen extends StatelessWidget {
+class BarbersProfileScreen extends StatefulWidget {
   const BarbersProfileScreen({super.key});
+
+  @override
+  State<BarbersProfileScreen> createState() => _BarbersProfileScreenState();
+}
+
+class _BarbersProfileScreenState extends State<BarbersProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AuthProvider>().fetchBarberDetails();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,56 +44,73 @@ class BarbersProfileScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.loginBackgroundStart,
-              AppColors.loginBackgroundEnd,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          bottom: false,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _ProfileHeaderSection(
-                  onEditProfile: () {
-                    Navigator.pushNamed(context, AppRoutes.profileStep1);
-                  },
-                ),
-                const SizedBox(height: 20),
-                _ProfileMenuSection(
-                  onLogout: () async {
-                    final auth =
-                        Provider.of<AuthProvider>(context, listen: false);
-                    await auth.logout();
-                    AppRoutes.navigateToLogin(context);
-                  },
-                ),
-                const SizedBox(height: 16),
-              ],
+      body: Consumer<AuthProvider>(
+        builder: (context, auth, _) {
+          return Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppColors.loginBackgroundStart,
+                  AppColors.loginBackgroundEnd,
+                ],
+              ),
             ),
-          ),
-        ),
+            child: SafeArea(
+              bottom: false,
+              child: auth.isLoading && auth.barberData == null
+                  ? const Center(child: CircularProgressIndicator())
+                  : RefreshIndicator(
+                      onRefresh: () async {
+                        await auth.fetchBarberDetails();
+                      },
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _ProfileHeaderSection(
+                              barber: auth.barberData,
+                              onEditProfile: () {
+                                Navigator.pushNamed(
+                                    context, AppRoutes.profileStep1);
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                            _ProfileMenuSection(
+                              onLogout: () async {
+                                await auth.logout();
+                                AppRoutes.navigateToLogin(context);
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+                        ),
+                      ),
+                    ),
+            ),
+          );
+        },
       ),
     );
   }
 }
 
 class _ProfileHeaderSection extends StatelessWidget {
+  final BarberModel? barber;
   final VoidCallback onEditProfile;
 
-  const _ProfileHeaderSection({required this.onEditProfile});
+  const _ProfileHeaderSection({
+    required this.barber,
+    required this.onEditProfile,
+  });
 
   @override
   Widget build(BuildContext context) {
     final textTheme = GoogleFonts.interTextTheme(Theme.of(context).textTheme);
+    final isVerified = barber?.isVerified ?? false;
 
     return Column(
       children: [
@@ -101,10 +131,12 @@ class _ProfileHeaderSection extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 28,
-                backgroundImage:
-                    AssetImage('assets/images/_barber_profile_image.jpg'),
+                backgroundImage: (barber?.profileImage != null &&
+                        barber!.profileImage!.isNotEmpty)
+                    ? NetworkImage(barber!.profileImage!) as ImageProvider
+                    : const AssetImage('assets/images/_barber_profile_image.jpg'),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -117,7 +149,7 @@ class _ProfileHeaderSection extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            'Royal Salon',
+                            barber?.salonName ?? 'Salon Name',
                             style: textTheme.titleMedium?.copyWith(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -131,20 +163,22 @@ class _ProfileHeaderSection extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: AppColors.successColor,
+                            color: isVerified
+                                ? AppColors.successColor
+                                : AppColors.warningColor,
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(
-                                Icons.verified,
+                              Icon(
+                                isVerified ? Icons.verified : Icons.history,
                                 size: 14,
                                 color: Colors.white,
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'Verified',
+                                isVerified ? 'Verified' : 'Pending',
                                 style: textTheme.labelSmall?.copyWith(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
@@ -167,7 +201,7 @@ class _ProfileHeaderSection extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '4.8',
+                          barber?.rating ?? '0.0',
                           style: textTheme.bodySmall?.copyWith(
                             fontSize: 13,
                             color: AppColors.loginSubtitleText,
