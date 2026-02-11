@@ -12,6 +12,7 @@ import '../../widgets/common_button.dart';
 import '../../widgets/common_text_field.dart';
 import '../../widgets/upload_card.dart';
 import '../../widgets/booking_widgets.dart';
+import '../../widgets/app_dialogs.dart';
 
 class SalonInfoScreen extends StatefulWidget {
   const SalonInfoScreen({super.key});
@@ -242,28 +243,33 @@ class _SalonInfoScreenState extends State<SalonInfoScreen> {
           title: 'Salon Cover Photo',
           subtitle: 'Upload a clear photo of your salon front',
           onTapPrimary: _isEditing ? _pickCoverPhoto : null,
-          primaryPreview: _coverPhoto != null
-              ? Image.file(
-                  File(_coverPhoto!.path),
-                  fit: BoxFit.cover,
-                )
+          primaryFileName: _coverPhoto?.name,
+          primaryPreview: _coverPhoto != null ? const SizedBox.shrink() : null,
+          onRemovePrimary: _isEditing ? () => setState(() => _coverPhoto = null) : null,
+          onViewPrimary: _coverPhoto != null
+              ? () => AppDialogs.showImagePreview(
+                    context: context,
+                    image: Image.file(File(_coverPhoto!.path)),
+                  )
               : null,
         ),
-        const SizedBox(height: 8),
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton(
-            onPressed: _isEditing ? _pickCoverPhoto : null,
-            child: Text(
-              _coverPhoto == null ? 'Upload Photo' : 'Change Photo',
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: AppColors.primaryColor,
+        if (!_isEditing) ...[
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: _isEditing ? _pickCoverPhoto : null,
+              child: Text(
+                _coverPhoto == null ? 'Upload Photo' : 'Change Photo',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.primaryColor,
+                ),
               ),
             ),
           ),
-        ),
+        ],
       ],
     );
   }
