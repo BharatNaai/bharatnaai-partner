@@ -28,8 +28,13 @@ class _ProfileSetupStep3ScreenState extends State<ProfileSetupStep3Screen> {
   XFile? _panFile;
   XFile? _aadhaarFrontFile;
   XFile? _aadhaarBackFile;
+  XFile? _profileImageFile; // Added
 
-  bool get _canComplete => _panFile != null && _aadhaarFrontFile != null && _aadhaarBackFile != null;
+  bool get _canComplete => 
+      _panFile != null && 
+      _aadhaarFrontFile != null && 
+      _aadhaarBackFile != null &&
+      _profileImageFile != null; // Added profile image requirement
 
   Future<void> _handleCompleteSetup() async {
     final provider = context.read<ProfileSetupProvider>();
@@ -40,6 +45,7 @@ class _ProfileSetupStep3ScreenState extends State<ProfileSetupStep3Screen> {
       panCard: _panFile,
       aadhaarFront: _aadhaarFrontFile,
       aadhaarBack: _aadhaarBackFile,
+      profileImage: _profileImageFile, // Added
     );
 
     // Submit profile to API
@@ -111,6 +117,14 @@ class _ProfileSetupStep3ScreenState extends State<ProfileSetupStep3Screen> {
     });
   }
 
+  Future<void> _pickProfileImage() async {
+    final file = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    if (file == null) return;
+    setState(() {
+      _profileImageFile = file;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -174,27 +188,48 @@ class _ProfileSetupStep3ScreenState extends State<ProfileSetupStep3Screen> {
                   ),
                   const SizedBox(height: 16),
                   UploadCard(
+                    title: 'Upload Profile Image',
+                    isDoubleSlot: false,
+                    onTapPrimary: _pickProfileImage,
+                    primaryFileName: _profileImageFile?.name,
+                    primaryPreview: _profileImageFile != null ? const SizedBox.shrink() : null, // Dummy to trigger 'hasPreview'
+                    onRemovePrimary: () => setState(() => _profileImageFile = null),
+                    onViewPrimary: _profileImageFile != null 
+                      ? () => AppDialogs.showImagePreview(
+                          context: context, 
+                          image: Image.file(File(_profileImageFile!.path)),
+                        )
+                      : null,
+                  ),
+                  const SizedBox(height: 12),
+                  UploadCard(
                     title: 'Upload GST Certificate (optional)',
                     isDoubleSlot: false,
                     onTapPrimary: _pickGst,
-                    primaryPreview: _gstFile != null
-                        ? Image.file(
-                            File(_gstFile!.path),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
+                    primaryFileName: _gstFile?.name,
+                    primaryPreview: _gstFile != null ? const SizedBox.shrink() : null,
+                    onRemovePrimary: () => setState(() => _gstFile = null),
+                    onViewPrimary: _gstFile != null 
+                      ? () => AppDialogs.showImagePreview(
+                          context: context, 
+                          image: Image.file(File(_gstFile!.path)),
+                        )
+                      : null,
                   ),
                   const SizedBox(height: 12),
                   UploadCard(
                     title: 'Upload PAN Card',
                     isDoubleSlot: false,
                     onTapPrimary: _pickPan,
-                    primaryPreview: _panFile != null
-                        ? Image.file(
-                            File(_panFile!.path),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
+                    primaryFileName: _panFile?.name,
+                    primaryPreview: _panFile != null ? const SizedBox.shrink() : null,
+                    onRemovePrimary: () => setState(() => _panFile = null),
+                    onViewPrimary: _panFile != null 
+                      ? () => AppDialogs.showImagePreview(
+                          context: context, 
+                          image: Image.file(File(_panFile!.path)),
+                        )
+                      : null,
                   ),
                   const SizedBox(height: 12),
                   UploadCard(
@@ -202,18 +237,24 @@ class _ProfileSetupStep3ScreenState extends State<ProfileSetupStep3Screen> {
                     isDoubleSlot: true,
                     onTapPrimary: _pickAadhaarFront,
                     onTapSecondary: _pickAadhaarBack,
-                    primaryPreview: _aadhaarFrontFile != null
-                        ? Image.file(
-                            File(_aadhaarFrontFile!.path),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
-                    secondaryPreview: _aadhaarBackFile != null
-                        ? Image.file(
-                            File(_aadhaarBackFile!.path),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
+                    primaryFileName: _aadhaarFrontFile?.name,
+                    secondaryFileName: _aadhaarBackFile?.name,
+                    primaryPreview: _aadhaarFrontFile != null ? const SizedBox.shrink() : null,
+                    secondaryPreview: _aadhaarBackFile != null ? const SizedBox.shrink() : null,
+                    onRemovePrimary: () => setState(() => _aadhaarFrontFile = null),
+                    onRemoveSecondary: () => setState(() => _aadhaarBackFile = null),
+                    onViewPrimary: _aadhaarFrontFile != null 
+                      ? () => AppDialogs.showImagePreview(
+                          context: context, 
+                          image: Image.file(File(_aadhaarFrontFile!.path)),
+                        )
+                      : null,
+                    onViewSecondary: _aadhaarBackFile != null 
+                      ? () => AppDialogs.showImagePreview(
+                          context: context, 
+                          image: Image.file(File(_aadhaarBackFile!.path)),
+                        )
+                      : null,
                   ),
                   const SizedBox(height: 16),
                   Row(

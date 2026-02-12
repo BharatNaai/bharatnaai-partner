@@ -19,6 +19,7 @@ class ProfileSetupStep1Screen extends StatefulWidget {
 
 class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
   final _salonNameController = TextEditingController();
+  final _ownerNameController = TextEditingController(); // Added
   final _businessTypeController = TextEditingController();
   final _addressController = TextEditingController();
   final _pincodeController = TextEditingController();
@@ -29,6 +30,7 @@ class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
   final _longitudeController = TextEditingController();
 
   final _salonNameFocus = FocusNode();
+  final _ownerNameFocus = FocusNode(); // Added
   final _addressFocus = FocusNode();
   final _pincodeFocus = FocusNode();
   final _cityFocus = FocusNode();
@@ -39,6 +41,7 @@ class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
 
   bool get _isFormValid =>
       _salonNameController.text.trim().isNotEmpty &&
+      _ownerNameController.text.trim().isNotEmpty && // Added
       _businessTypeController.text.trim().isNotEmpty &&
       _addressController.text.trim().isNotEmpty &&
       _pincodeController.text.trim().isNotEmpty &&
@@ -49,6 +52,7 @@ class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
   @override
   void dispose() {
     _salonNameController.dispose();
+    _ownerNameController.dispose(); // Added
     _businessTypeController.dispose();
     _addressController.dispose();
     _pincodeController.dispose();
@@ -58,6 +62,7 @@ class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
     _latitudeController.dispose();
     _longitudeController.dispose();
     _salonNameFocus.dispose();
+    _ownerNameFocus.dispose(); // Added
     _addressFocus.dispose();
     _pincodeFocus.dispose();
     _cityFocus.dispose();
@@ -71,7 +76,7 @@ class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
   void _openBusinessTypePicker() {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder (
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (context) {
@@ -216,11 +221,22 @@ class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
                     focusNode: _salonNameFocus,
                     autofocus: true,
                     textInputAction: TextInputAction.next,
-                    onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_addressFocus),
+                    onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_ownerNameFocus),
                     labelText: 'Salon Name',
                     semanticLabel: "Enter salon name, required",
                     prefixIcon: Icons.storefront_outlined,
                     keyboardType: TextInputType.text,
+                  ),
+                  const SizedBox(height: 12),
+                  CommonTextField(
+                    controller: _ownerNameController,
+                    focusNode: _ownerNameFocus,
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_addressFocus),
+                    labelText: 'Owner Name',
+                    semanticLabel: "Enter owner name, required",
+                    prefixIcon: Icons.person_outline,
+                    keyboardType: TextInputType.name,
                   ),
                   const SizedBox(height: 12),
                   GestureDetector(
@@ -357,21 +373,22 @@ class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
                       onPressed: _isFormValid
                           ? () {
                               // Save Step 1 data to provider
-                              context.read<ProfileSetupProvider>().saveStep1Data(
-                                salonName: _salonNameController.text.trim(),
-                                businessType: _businessTypeController.text.trim(),
-                                address: _addressController.text.trim(),
-                                pincode: _pincodeController.text.trim(),
-                                city: _cityController.text.trim(),
-                                state: _stateController.text.trim(),
-                                country: _countryController.text.trim(),
-                                latitude: _latitudeController.text.trim().isNotEmpty 
-                                    ? _latitudeController.text.trim() 
-                                    : null,
-                                longitude: _longitudeController.text.trim().isNotEmpty 
-                                    ? _longitudeController.text.trim() 
-                                    : null,
-                              );
+                                context.read<ProfileSetupProvider>().saveStep1Data(
+                                  salonName: _salonNameController.text.trim(),
+                                  ownerName: _ownerNameController.text.trim(),
+                                  businessType: _businessTypeController.text.trim(),
+                                  address: _addressController.text.trim(),
+                                  pincode: _pincodeController.text.trim(),
+                                  city: _cityController.text.trim(),
+                                  state: _stateController.text.trim(),
+                                  country: _countryController.text.trim(),
+                                  latitude: _latitudeController.text.trim().isNotEmpty 
+                                      ? _latitudeController.text.trim() 
+                                      : null,
+                                  longitude: _longitudeController.text.trim().isNotEmpty 
+                                      ? _longitudeController.text.trim() 
+                                      : null,
+                                );
                               Navigator.pushNamed(context, AppRoutes.profileStep2);
                             }
                           : null,

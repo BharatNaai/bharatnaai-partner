@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:partner_app/models/profile_setup_request.dart';
 import 'package:partner_app/services/profile_setup_service.dart';
 import 'package:partner_app/services/user_storage_service.dart';
+import 'package:partner_app/services/device_info_service.dart';
 
 /// Provider to manage profile setup data across 3 steps.
 class ProfileSetupProvider extends ChangeNotifier {
@@ -20,6 +22,7 @@ class ProfileSetupProvider extends ChangeNotifier {
   /// Save Step 1 (Salon Details) data.
   void saveStep1Data({
     required String salonName,
+    String? ownerName, // Added
     required String businessType,
     required String address,
     required String pincode,
@@ -31,6 +34,7 @@ class ProfileSetupProvider extends ChangeNotifier {
   }) {
     _data = _data.copyWith(
       salonName: salonName,
+      ownerName: ownerName,
       businessType: businessType,
       address: address,
       pincode: pincode,
@@ -65,12 +69,14 @@ class ProfileSetupProvider extends ChangeNotifier {
     XFile? panCard,
     XFile? aadhaarFront,
     XFile? aadhaarBack,
+    XFile? profileImage, // Added
   }) {
     _data = _data.copyWith(
       gstCertificate: gstCertificate,
       panCard: panCard,
       aadhaarFront: aadhaarFront,
       aadhaarBack: aadhaarBack,
+      profileImage: profileImage, // Added
     );
     notifyListeners();
   }
@@ -91,6 +97,14 @@ class ProfileSetupProvider extends ChangeNotifier {
         notifyListeners();
         return false;
       }
+
+      // Populate device info
+      final deviceId = await DeviceInfoService.getDeviceId();
+      _data = _data.copyWith(
+        deviceId: deviceId,
+        deviceType: Platform.isAndroid ? 'Android' : 'iOS',
+        appVersion: '1.0.0', // Default if no PackageInfo
+      );
 
       final result = await _service.updateBarberProfile(barberId, _data);
 

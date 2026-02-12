@@ -6,47 +6,65 @@ import 'package:partner_app/models/profile_setup_request.dart';
 class ProfileSetupService {
   /// Updates barber profile with the provided data using multipart/form-data.
   Future<Map<String, dynamic>> updateBarberProfile(
-      String barberId,
-      ProfileSetupRequest data,
-      ) async {
-    final url = Uri.parse(
-      '${ApiConstants.baseUrl}${ApiConstants.register}?barberId=$barberId',
-    );
+    String barberId,
+    ProfileSetupRequest data,
+  ) async {
+    // Construct URL with path parameter {barberId} and query parameters
+    final baseUrl = ApiConstants.baseUrl.endsWith('/')
+        ? ApiConstants.baseUrl.substring(0, ApiConstants.baseUrl.length - 1)
+        : ApiConstants.baseUrl;
+    
+    final endpoint = ApiConstants.updateBarberProfile.startsWith('/')
+        ? ApiConstants.updateBarberProfile
+        : '/${ApiConstants.updateBarberProfile}';
 
+    final uri = Uri.parse('$baseUrl$endpoint/$barberId');
+    
     try {
-      final request = http.MultipartRequest('PUT', url);
+      // The image shows a PUT request (Update)
+      final request = http.MultipartRequest('PUT', uri);
+
+      // Add text fields to the multipart request
+      request.fields.addAll(data.toMultipartFields());
 
       // Required headers
       request.headers['Accept'] = 'application/json';
-      request.headers['Content-Type'] = 'multipart/form-data';
+      // http.MultipartRequest automatically sets Content-Type to multipart/form-data with boundary
 
-      // Add all text fields safely
-      final formFields = data.toFormFields();
-      formFields.forEach((key, value) {
-        if (value != null && value.toString().trim().isNotEmpty) {
-          request.fields[key] = value.toString().trim();
-        }
-      });
-
-      // Attach files if present
-      if (data.gstCertificate != null) {
+      // Attach files as shown in the image
+      // imagePath (binary)
+      if (data.profileImage != null) {
         request.files.add(
           await http.MultipartFile.fromPath(
-            'gstCertificate',
-            data.gstCertificate!.path,
+            'imagePath',
+            data.profileImage!.path,
           ),
         );
       }
 
+      // panCardPath (binary)
       if (data.panCard != null) {
         request.files.add(
           await http.MultipartFile.fromPath(
-            'panCard',
+            'panCardPath', 
             data.panCard!.path,
           ),
         );
       }
 
+      // gstCertificatePath (binary)
+      if (data.gstCertificate != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'gstCertificatePath',
+            data.gstCertificate!.path,
+          ),
+        );
+      }
+
+      // If existing logic still needs Aadhaar, we can add them, 
+      // but matching the image "accordingly" we focus on the above.
+      // Keeping them as optional extras for robustness if the server still expects them.
       if (data.aadhaarFront != null) {
         request.files.add(
           await http.MultipartFile.fromPath(
@@ -55,7 +73,6 @@ class ProfileSetupService {
           ),
         );
       }
-
       if (data.aadhaarBack != null) {
         request.files.add(
           await http.MultipartFile.fromPath(
@@ -70,6 +87,7 @@ class ProfileSetupService {
       final response = await http.Response.fromStream(streamedResponse);
 
       // Debug logs
+      print("URL: $uri");
       print("STATUS CODE: ${response.statusCode}");
       print("RAW RESPONSE: ${response.body}");
 
@@ -85,18 +103,18 @@ class ProfileSetupService {
       final decoded = safeDecode(response.body);
 
       // Success case
-      if ((response.statusCode == 200 || response.statusCode == 201) && decoded.isNotEmpty) {
+      if ((response.statusCode == 200 || response.statusCode == 201)) {
         return {
-          'success': decoded['success'] ?? true, 
+          'success': decoded['success'] ?? true,
           'message': decoded['message'] ?? 'Profile updated successfully',
+          'data': decoded,
         };
       }
 
-      // Failure / non-JSON response
+      // Failure
       return {
         'success': false,
-        'message': decoded['message'] ??
-            'Failed to update profile. Server returned non-JSON response.',
+        'message': decoded['message'] ?? 'Failed to update profile.',
         'statusCode': response.statusCode,
         'rawBody': response.body,
       };
