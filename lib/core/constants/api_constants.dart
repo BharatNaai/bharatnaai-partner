@@ -1,6 +1,8 @@
 class ApiConstants {
   // Base URLs
-  static const String baseUrl = "http://bharatnaai.com/";
+  //static const String baseUrl = "http://bharatnaai.com/";
+  //static const String baseUrl = "http://localhost:8080/";
+  static const String baseUrl = "https://pronely-nontroubling-kit.ngrok-free.dev/";
 
   // API Endpoints
   static const String login = 'barbers/login';
@@ -10,7 +12,7 @@ class ApiConstants {
   static const String logout = '/logout';
   static const String forgotPassword = '/forgot-password';
   static const String resetPassword = '/reset-password';
-  static const String barberDetails = 'barbers/barbers-details';
+  static const String barberDetails = 'barbers-details/{barber_id}';
   static const String updateBarberProfile = '/barbers/update-barbers';
 
   // Third-party API keys (replace with your actual keys)

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:partner_app/providers/auth_provider.dart';
 import 'package:partner_app/core/constants/app_colors.dart';
 import 'package:partner_app/core/constants/app_strings.dart';
 import 'package:partner_app/routes/app_routes.dart';
@@ -161,7 +163,7 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
             ),
             const SizedBox(height: 2),
             Text(
-              'Welcome back, Rahul\'s Salon',
+              'Welcome back, ${context.read<AuthProvider>().barberData?.barberName ?? 'Partner'}',
               style: textTheme.bodySmall?.copyWith(
                 fontSize: 12,
                 color: AppColors.loginSubtitleText,
@@ -169,6 +171,43 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
             ),
           ],
         ),
+        actions: [
+          Consumer<AuthProvider>(
+            builder: (context, authProvider, _) {
+              if (authProvider.isProfileCompleted) {
+                return const SizedBox.shrink();
+              }
+              return Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Center(
+                  child: SizedBox(
+                    height: 32,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, AppRoutes.profileStep1);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.errorColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: const Text(
+                        'Complete Profile',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
 
       // ------------------ BODY ---------------------

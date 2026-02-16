@@ -162,7 +162,11 @@ class _LoginScreenState extends State<LoginScreen>
       );
 
       if (success && mounted) {
-        Navigator.pushReplacementNamed(context, AppRoutes.profileStep1);
+        if (authProvider.isProfileCompleted) {
+          Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+        } else {
+          Navigator.pushReplacementNamed(context, AppRoutes.profileStep1);
+        }
       } else if (mounted) {
         setState(() => _isLoading = false);
         _showErrorSnackBar(authProvider.errorMessage ?? 'Login failed');

@@ -7,6 +7,7 @@ class ProfileSetupService {
   /// Updates barber profile with the provided data using multipart/form-data.
   Future<Map<String, dynamic>> updateBarberProfile(
     String barberId,
+    String authToken,
     ProfileSetupRequest data,
   ) async {
     // Construct URL with path parameter {barberId} and query parameters
@@ -29,6 +30,7 @@ class ProfileSetupService {
 
       // Required headers
       request.headers['Accept'] = 'application/json';
+      request.headers['Authorization'] = 'Bearer $authToken';
       // http.MultipartRequest automatically sets Content-Type to multipart/form-data with boundary
 
       // Attach files as shown in the image

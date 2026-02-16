@@ -82,13 +82,19 @@ class AuthService {
     }
   }
 
-  Future<Map<String, dynamic>> getBarberDetails(String barberId) async {
-    final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.barberDetails}?barberId=$barberId');
+  Future<Map<String, dynamic>> getBarberDetails(String barberId, String authToken) async {
+    final String endpoint = ApiConstants.barberDetails.replaceAll('{barber_id}', barberId);
+    final url = Uri.parse('${ApiConstants.baseUrl}$endpoint');
 
     try {
+      final headers = {
+        ...ApiConstants.defaultHeaders,
+        'Authorization': 'Bearer $authToken',
+      };
+
       final response = await http.get(
         url,
-        headers: ApiConstants.defaultHeaders,
+        headers: headers,
       );
 
       final decoded = jsonDecode(response.body) as Map<String, dynamic>;

@@ -188,11 +188,13 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> fetchBarberDetails() async {
     final barberId = await UserStorageService.getBarberId();
-    if (barberId == null) return;
+    final authToken = await UserStorageService.getAccessToken();
+    
+    if (barberId == null || authToken == null) return;
 
     _setLoading(true);
     try {
-      final result = await _authService.getBarberDetails(barberId);
+      final result = await _authService.getBarberDetails(barberId, authToken);
       if (result['success'] == true) {
         _barberData = BarberModel.fromJson(result['data']);
         _isProfileCompleted = _barberData?.isVerified ?? false;

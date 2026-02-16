@@ -403,7 +403,7 @@ class _ProfileSetupStep1ScreenState extends State<ProfileSetupStep1Screen> {
                         AppRoutes.navigateToDashboard(context);
                       },
                       child: Text(
-                        'Save & Continue Later',
+                        'Skip & Continue Later',
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,

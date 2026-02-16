@@ -90,23 +90,16 @@ class ProfileSetupProvider extends ChangeNotifier {
     try {
       // Get barberId from storage
       final barberId = await UserStorageService.getBarberId();
+      final authToken = await UserStorageService.getAccessToken();
       
-      if (barberId == null || barberId.isEmpty) {
-        _errorMessage = 'Barber ID not found. Please login again.';
+      if (barberId == null || barberId.isEmpty || authToken == null || authToken.isEmpty) {
+        _errorMessage = 'Barber ID or Token not found. Please login again.';
         _isLoading = false;
         notifyListeners();
         return false;
       }
 
-      // Populate device info
-      final deviceId = await DeviceInfoService.getDeviceId();
-      _data = _data.copyWith(
-        deviceId: deviceId,
-        deviceType: Platform.isAndroid ? 'Android' : 'iOS',
-        appVersion: '1.0.0', // Default if no PackageInfo
-      );
-
-      final result = await _service.updateBarberProfile(barberId, _data);
+      final result = await _service.updateBarberProfile(barberId, authToken, _data);
 
       if (result['success'] == true) {
         _isLoading = false;
