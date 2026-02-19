@@ -10,16 +10,7 @@ class ProfileSetupService {
     String authToken,
     ProfileSetupRequest data,
   ) async {
-    // Construct URL with path parameter {barberId} and query parameters
-    final baseUrl = ApiConstants.baseUrl.endsWith('/')
-        ? ApiConstants.baseUrl.substring(0, ApiConstants.baseUrl.length - 1)
-        : ApiConstants.baseUrl;
-    
-    final endpoint = ApiConstants.updateBarberProfile.startsWith('/')
-        ? ApiConstants.updateBarberProfile
-        : '/${ApiConstants.updateBarberProfile}';
-
-    final uri = Uri.parse('$baseUrl$endpoint/$barberId');
+    final uri = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.updateBarberProfile}/$barberId');
     
     try {
       // The image shows a PUT request (Update)

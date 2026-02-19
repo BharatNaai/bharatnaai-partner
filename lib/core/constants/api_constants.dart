@@ -12,8 +12,8 @@ class ApiConstants {
   static const String logout = '/logout';
   static const String forgotPassword = '/forgot-password';
   static const String resetPassword = '/reset-password';
-  static const String barberDetails = 'barbers-details/{barber_id}';
-  static const String updateBarberProfile = '/barbers/update-barbers';
+  static const String barberDetails = 'barbers/barbers-details/{barber_id}';
+  static const String updateBarberProfile = 'barbers/update-barbers';
 
   // Third-party API keys (replace with your actual keys)
   static const String stripePublishableKey = 'pk_test_your_stripe_key_here';
