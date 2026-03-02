@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 
 import 'package:partner_app/core/constants/app_colors.dart';
 import 'package:partner_app/providers/location_provider.dart';
-import 'package:partner_app/routes/app_routes.dart';
+import 'package:partner_app/providers/auth_provider.dart';
 
 import '../../widgets/common_button.dart';
 import '../../widgets/common_text_field.dart';
@@ -21,13 +21,14 @@ class PersonalInfoScreen extends StatefulWidget {
 
 class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   final _fullNameController = TextEditingController();
-  final _phoneController = TextEditingController(text: '+91 98765 43210');
+  final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   final _dobController = TextEditingController();
   final _addressController = TextEditingController();
 
   final ImagePicker _picker = ImagePicker();
   XFile? _profileImage;
+  String? _networkProfileImage;
 
   bool _isEditing = false;
   String _selectedGender = 'Male';
@@ -35,6 +36,24 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   bool get _isFormValid =>
       _fullNameController.text.trim().isNotEmpty &&
       _addressController.text.trim().isNotEmpty;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBarberData();
+  }
+
+  void _loadBarberData() {
+    final barber = context.read<AuthProvider>().barberData;
+    if (barber != null) {
+      _fullNameController.text = barber.barberName ?? '';
+      _phoneController.text = barber.phone ?? '';
+      _emailController.text = barber.email ?? '';
+      _addressController.text = barber.salon?.address ?? '';
+      _networkProfileImage = barber.profileImage ?? barber.salon?.imagePath;
+      setState(() {});
+    }
+  }
 
   @override
   void dispose() {
@@ -213,23 +232,34 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
               ),
             ),
             child: ClipOval(
-              child: _profileImage != null
-                  ? Image.file(
-                      File(_profileImage!.path),
-                      fit: BoxFit.cover,
-                    )
-                  : Center(
-                      child: Text(
-                        'Add Profile\nPhoto',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.loginSubtitleText,
+            child: _profileImage != null
+                ? Image.file(
+                    File(_profileImage!.path),
+                    fit: BoxFit.cover,
+                  )
+                : (_networkProfileImage != null && _networkProfileImage!.isNotEmpty)
+                    ? Image.network(
+                        _networkProfileImage!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Center(
+                            child: Icon(Icons.person,
+                                size: 50, color: AppColors.textGrey),
+                          );
+                        },
+                      )
+                    : Center(
+                        child: Text(
+                          'Add Profile\nPhoto',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.loginSubtitleText,
+                          ),
                         ),
                       ),
-                    ),
-            ),
+          ),
           ),
         ),
         const SizedBox(height: 8),

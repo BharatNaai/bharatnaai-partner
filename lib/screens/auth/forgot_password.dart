@@ -158,6 +158,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                   const SizedBox(height: 32),
                   CommonTextField(
+                    maxLengths: 10,
                     controller: _phoneController,
                     labelText: AppStrings.phoneNumber,
                     keyboardType: TextInputType.phone,

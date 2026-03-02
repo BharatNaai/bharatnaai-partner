@@ -13,6 +13,7 @@ class CommonTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final bool obscureText;
   final int maxLines;
+  final int? maxLengths;
   final String? errorText;
   final bool enabled;
   final FocusNode? focusNode;
@@ -35,6 +36,7 @@ class CommonTextField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.obscureText = false,
     this.maxLines = 1,
+    this.maxLengths,
     this.errorText,
     this.enabled = true,
     this.focusNode,

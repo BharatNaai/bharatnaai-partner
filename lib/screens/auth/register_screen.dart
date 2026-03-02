@@ -136,6 +136,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 CommonTextField(
                   controller: _phoneNumberController,
                   focusNode: _phoneFocus,
+                  maxLengths: 10,
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_emailFocus),
                   labelText: AppStrings.phoneNumber,

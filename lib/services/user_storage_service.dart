@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:partner_app/models/user_model.dart';
+import 'package:partner_app/models/barber_model.dart';
 
 class UserStorageService {
   static const String _userKey = 'user_data';
@@ -12,6 +13,7 @@ class UserStorageService {
   static const String _refreshTokenKey = 'refresh_token';
   static const String _barberIdKey = 'barber_id';
   static const String _isProfileCompletedKey = 'is_profile_completed';
+  static const String _barberDataKey = 'barber_data';
 
   // Callback for when user data is cleared
   static VoidCallback? _onDataCleared;
@@ -156,11 +158,47 @@ class UserStorageService {
     await prefs.remove(_refreshTokenKey);
     await prefs.remove(_barberIdKey);
     await prefs.remove(_isProfileCompletedKey);
+    await prefs.remove(_barberDataKey);
     await prefs.setBool(_isLoggedInKey, false);
     debugPrint('UserStorageService: All user data cleared');
 
     // Notify callback if set
     _onDataCleared?.call();
+  }
+
+  /// Persist the full [BarberModel] (from /barbers/barbers-details) to disk.
+  static Future<void> saveBarberData(BarberModel barber) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_barberDataKey, barber.toJsonString());
+    debugPrint('UserStorageService: BarberModel saved (status=${barber.status})');
+  }
+
+  /// Retrieve the [BarberModel] that was last saved by [saveBarberData].
+  static Future<BarberModel?> getBarberData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final json = prefs.getString(_barberDataKey);
+    if (json == null) return null;
+    final barber = BarberModel.fromJsonString(json);
+    debugPrint('UserStorageService: BarberModel retrieved (status=${barber?.status})');
+    return barber;
+  }
+
+  /// Quick-access: the raw status string, e.g. "Verified" or "Pending".
+  static Future<String?> getBarberStatus() async {
+    final barber = await getBarberData();
+    return barber?.status;
+  }
+
+  /// Quick-access: barber's display name.
+  static Future<String?> getBarberName() async {
+    final barber = await getBarberData();
+    return barber?.barberName;
+  }
+
+  /// Quick-access: the salon name from the nested salon object.
+  static Future<String?> getSalonName() async {
+    final barber = await getBarberData();
+    return barber?.salon?.salonName;
   }
 
   // Set callback for when user data is cleared

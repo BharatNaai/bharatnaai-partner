@@ -198,14 +198,34 @@ class AuthProvider extends ChangeNotifier {
       if (result['success'] == true) {
         _barberData = BarberModel.fromJson(result['data']);
         _isProfileCompleted = _barberData?.isVerified ?? false;
+        // Persist to local storage so all screens can read it without re-fetching
+        if (_barberData != null) {
+          await UserStorageService.saveBarberData(_barberData!);
+        }
         notifyListeners();
       } else {
+        // Network/server failed — fall back to cached data if available
+        await _loadBarberFromCache();
         _setError(result['message'] ?? "Failed to load barber details");
       }
     } catch (e) {
+      // Network/server failed — fall back to cached data if available
+      await _loadBarberFromCache();
       _setError("Error: $e");
     } finally {
       _setLoading(false);
+    }
+  }
+
+  /// Load barber data from local cache (SharedPreferences).
+  /// Used as fallback when the server is unreachable.
+  Future<void> _loadBarberFromCache() async {
+    if (_barberData != null) return; // already in memory
+    final cached = await UserStorageService.getBarberData();
+    if (cached != null) {
+      _barberData = cached;
+      _isProfileCompleted = cached.isVerified;
+      notifyListeners();
     }
   }
 
@@ -215,6 +235,12 @@ class AuthProvider extends ChangeNotifier {
     if (isLoggedIn) {
       _isAuthenticated = true;
       _userToken = await UserStorageService.getAccessToken();
+      _isProfileCompleted = await UserStorageService.getProfileCompletionStatus();
+
+      // Restore cached barber data immediately (so UI doesn't flash empty)
+      await _loadBarberFromCache();
+
+      // Then try to refresh from the network
       await fetchBarberDetails();
       notifyListeners();
     }

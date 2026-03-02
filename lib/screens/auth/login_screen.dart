@@ -335,6 +335,7 @@ class _LoginScreenState extends State<LoginScreen>
       validator: (_) => _phoneError,
       obscureText: false,
       maxLines: 1,
+      maxLengths: 10,
     );
   }
 

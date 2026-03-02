@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import 'package:partner_app/core/constants/app_colors.dart';
 import 'package:partner_app/providers/location_provider.dart';
+import 'package:partner_app/providers/auth_provider.dart';
 
 import '../../widgets/common_button.dart';
 import '../../widgets/common_text_field.dart';
@@ -30,6 +31,7 @@ class _SalonInfoScreenState extends State<SalonInfoScreen> {
 
   final ImagePicker _picker = ImagePicker();
   XFile? _coverPhoto;
+  String? _networkCoverPhotoUrl;
 
   bool _isEditing = false;
 
@@ -41,6 +43,26 @@ class _SalonInfoScreenState extends State<SalonInfoScreen> {
   bool get _isFormValid =>
       _salonNameController.text.trim().isNotEmpty &&
       _addressController.text.trim().isNotEmpty;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSalonData();
+  }
+
+  void _loadSalonData() {
+    final barber = context.read<AuthProvider>().barberData;
+    final salon = barber?.salon;
+    if (salon != null) {
+      _salonNameController.text = salon.salonName ?? '';
+      _taglineController.text = salon.ownerName ?? '';
+      _addressController.text = salon.address ?? '';
+      _cityController.text = salon.city ?? '';
+      _pincodeController.text = salon.pincode ?? '';
+      _networkCoverPhotoUrl = salon.imagePath;
+      setState(() {});
+    }
+  }
 
   @override
   void dispose() {
@@ -236,6 +258,31 @@ class _SalonInfoScreenState extends State<SalonInfoScreen> {
   }
 
   Widget _buildUploadSection(TextTheme textTheme) {
+    // Determine what preview to show: local pick > network URL > nothing
+    Widget? primaryPreview;
+    if (_coverPhoto != null) {
+      primaryPreview = ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.file(
+          File(_coverPhoto!.path),
+          height: 80,
+          width: double.infinity,
+          fit: BoxFit.cover,
+        ),
+      );
+    } else if (_networkCoverPhotoUrl != null && _networkCoverPhotoUrl!.isNotEmpty) {
+      primaryPreview = ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.network(
+          _networkCoverPhotoUrl!,
+          height: 80,
+          width: double.infinity,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -244,14 +291,24 @@ class _SalonInfoScreenState extends State<SalonInfoScreen> {
           subtitle: 'Upload a clear photo of your salon front',
           onTapPrimary: _isEditing ? _pickCoverPhoto : null,
           primaryFileName: _coverPhoto?.name,
-          primaryPreview: _coverPhoto != null ? const SizedBox.shrink() : null,
-          onRemovePrimary: _isEditing ? () => setState(() => _coverPhoto = null) : null,
+          primaryPreview: primaryPreview,
+          onRemovePrimary: _isEditing
+              ? () => setState(() {
+                    _coverPhoto = null;
+                    _networkCoverPhotoUrl = null;
+                  })
+              : null,
           onViewPrimary: _coverPhoto != null
               ? () => AppDialogs.showImagePreview(
                     context: context,
                     image: Image.file(File(_coverPhoto!.path)),
                   )
-              : null,
+              : (_networkCoverPhotoUrl != null && _networkCoverPhotoUrl!.isNotEmpty)
+                  ? () => AppDialogs.showImagePreview(
+                        context: context,
+                        image: Image.network(_networkCoverPhotoUrl!),
+                      )
+                  : null,
         ),
         if (!_isEditing) ...[
           const SizedBox(height: 8),
