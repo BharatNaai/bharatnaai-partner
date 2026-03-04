@@ -9,6 +9,7 @@ enum BookingActionStatus { newRequest, confirmed, pending, rejected }
 class Booking {
   final String id;
   final String customerName;
+  final String? customerPhone;
   final String serviceName;
   final String priceDisplay;
   final int durationMinutes;
@@ -23,6 +24,7 @@ class Booking {
   const Booking({
     required this.id,
     required this.customerName,
+    this.customerPhone,
     required this.serviceName,
     required this.priceDisplay,
     required this.durationMinutes,
@@ -42,6 +44,7 @@ class Booking {
     return Booking(
       id: id,
       customerName: customerName,
+      customerPhone: customerPhone,
       serviceName: serviceName,
       priceDisplay: priceDisplay,
       durationMinutes: durationMinutes,
@@ -52,6 +55,45 @@ class Booking {
       mainStatus: mainStatus ?? this.mainStatus,
       timeFilter: timeFilter,
       actionStatus: actionStatus ?? this.actionStatus,
+    );
+  }
+
+  factory Booking.fromJson(Map<String, dynamic> json) {
+    final statusStr = (json['status'] ?? '').toString().toUpperCase();
+    BookingMainStatus status;
+    switch (statusStr) {
+      case 'ONGOING':
+        status = BookingMainStatus.ongoing;
+        break;
+      case 'COMPLETED':
+        status = BookingMainStatus.completed;
+        break;
+      case 'UPCOMING':
+      default:
+        status = BookingMainStatus.upcoming;
+        break;
+    }
+
+    // Format time display
+    final date = json['slotDate'] ?? '';
+    final start = json['startTime'] ?? '';
+    final end = json['endTime'] ?? '';
+    final timeDisplay = date.isNotEmpty ? '$date · $start - $end' : '$start - $end';
+
+    return Booking(
+      id: json['bookingId']?.toString() ?? '',
+      customerName: json['customerName'] ?? 'Unknown',
+      customerPhone: json['customerPhone'],
+      serviceName: json['serviceType'] ?? 'Service',
+      priceDisplay: 'N/A', // Not in current API
+      durationMinutes: 30, // Default duration
+      timeDisplay: timeDisplay,
+      locationLabel: 'At Salon',
+      locationDetail: json['customerPhone'] ?? '',
+      avatarUrl: '',
+      mainStatus: status,
+      timeFilter: BookingTimeFilter.today, // Map appropriately if needed
+      actionStatus: BookingActionStatus.confirmed,
     );
   }
 }

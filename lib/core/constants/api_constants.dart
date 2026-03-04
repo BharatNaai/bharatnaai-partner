@@ -17,6 +17,7 @@ class ApiConstants {
   static const String generateSlots = 'barbers/{barber_id}/generate-slots';
   static const String addService = 'barbers/generate-slots';
   static const String getBarberServices = 'barbers/{barber_id}/services';
+  static const String getAllBookings = 'barbers/all-bookings';
 
   // Third-party API keys (replace with your actual keys)
   static const String stripePublishableKey = 'pk_test_your_stripe_key_here';

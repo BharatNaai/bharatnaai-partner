@@ -32,6 +32,7 @@ class ServiceRepository {
         },
       );
 
+      print("Authorization: Bearer $authToken");
       print("Get Barber Services URL: $uri");
       print("Status Code: ${response.statusCode}");
       print("Response Body: ${response.body}");

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:partner_app/core/constants/app_colors.dart';
-import 'package:provider/provider.dart';
-import 'package:partner_app/providers/auth_provider.dart';
 import 'package:partner_app/models/service_offering.dart';
 import 'package:partner_app/repositories/service_repository.dart';
 import 'package:partner_app/widgets/common_text_field.dart';

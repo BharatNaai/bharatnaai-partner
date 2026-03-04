@@ -233,9 +233,9 @@ class BookingFilterChip extends StatelessWidget {
 class BookingCard extends StatelessWidget {
   final Booking booking;
   final VoidCallback onTap;
-  final VoidCallback onPrimaryAction;
+  final VoidCallback? onPrimaryAction;
   final VoidCallback? onSecondaryAction;
-  final String primaryLabel;
+  final String? primaryLabel;
   final String? secondaryLabel;
   final VoidCallback? onPhoneTap;
 
@@ -243,9 +243,9 @@ class BookingCard extends StatelessWidget {
     super.key,
     required this.booking,
     required this.onTap,
-    required this.onPrimaryAction,
+    this.onPrimaryAction,
     this.onSecondaryAction,
-    required this.primaryLabel,
+    this.primaryLabel,
     this.secondaryLabel,
     this.onPhoneTap,
   });
@@ -414,29 +414,33 @@ class BookingCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: CommonButton(
-                    text: primaryLabel,
-                    height: 44,
-                    onPressed: onPrimaryAction,
-                  ),
-                ),
-                if (secondaryLabel != null && onSecondaryAction != null) ...[
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: CommonButton(
-                      text: secondaryLabel!,
-                      height: 44,
-                      backgroundColor: AppColors.white,
-                      textColor: AppColors.textSecondary,
-                      onPressed: onSecondaryAction,
+            if (primaryLabel != null || secondaryLabel != null) ...[
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  if (primaryLabel != null && onPrimaryAction != null)
+                    Expanded(
+                      child: CommonButton(
+                        text: primaryLabel!,
+                        height: 44,
+                        onPressed: onPrimaryAction,
+                      ),
                     ),
-                  ),
+                  if (secondaryLabel != null && onSecondaryAction != null) ...[
+                    if (primaryLabel != null) const SizedBox(width: 12),
+                    Expanded(
+                      child: CommonButton(
+                        text: secondaryLabel!,
+                        height: 44,
+                        backgroundColor: AppColors.white,
+                        textColor: AppColors.textSecondary,
+                        onPressed: onSecondaryAction,
+                      ),
+                    ),
+                  ],
                 ],
-              ],
-            ),
+              ),
+            ],
           ],
         ),
       ),

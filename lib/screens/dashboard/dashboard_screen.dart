@@ -14,6 +14,7 @@ import 'package:partner_app/screens/profile/barbers_profile.dart';
 import 'package:partner_app/screens/services/services_offered_screen.dart';
 import 'package:partner_app/models/service_offering.dart';
 import 'package:partner_app/repositories/service_repository.dart';
+import 'package:partner_app/repositories/booking_repository.dart';
 import 'package:partner_app/services/user_storage_service.dart';
 import 'package:partner_app/widgets/common_text_field.dart';
 import 'package:partner_app/widgets/common_button.dart';
@@ -28,14 +29,19 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _currentIndex = 0;
+  late final List<Widget> _screens;
 
-  late final List<Widget> _screens = [
-    _DashboardHomeTab(),
-    const BookingsListScreen(),
-    const ServicesOfferedScreen(),
-    const EarningsScreen(),
-    const BarbersProfileScreen(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      _DashboardHomeTab(onNavigateToBookings: () => _onTabSelected(1)),
+      const BookingsListScreen(),
+      const ServicesOfferedScreen(),
+      const EarningsScreen(),
+      const BarbersProfileScreen(),
+    ];
+  }
 
   void _onTabSelected(int index) {
     setState(() {
@@ -61,20 +67,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
 }
 
 class _DashboardHomeTab extends StatefulWidget {
+  final VoidCallback onNavigateToBookings;
+  const _DashboardHomeTab({required this.onNavigateToBookings});
+
   @override
   State<_DashboardHomeTab> createState() => _DashboardHomeTabState();
 }
 
 class _DashboardHomeTabState extends State<_DashboardHomeTab> {
-  late List<Booking> _bookings;
-  late List<ServiceOffering> _services;
+  List<Booking> _bookings = [];
+  List<ServiceOffering> _services = [];
+  bool _isLoadingBookings = false;
 
   @override
   void initState() {
     super.initState();
-    _bookings = List<Booking>.from(kMockBookings);
     _services = <ServiceOffering>[];
     _loadServices();
+    _loadBookings();
   }
 
   void _updateBooking(Booking updated) {
@@ -83,6 +93,39 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
           .map((b) => b.id == updated.id ? updated : b)
           .toList(growable: false);
     });
+  }
+
+  Future<void> _loadBookings() async {
+    setState(() {
+      _isLoadingBookings = true;
+    });
+    try {
+      final barberId = await UserStorageService.getBarberId();
+      final authToken = await UserStorageService.getAccessToken();
+
+      if (barberId == null || authToken == null) {
+        return;
+      }
+
+      final repo = BookingRepository.instance;
+      final list = await repo.getAllBookings(
+        barberId: barberId,
+        authToken: authToken,
+      );
+
+      if (!mounted) return;
+      setState(() {
+        _bookings = list;
+        _isLoadingBookings = false;
+      });
+    } catch (e) {
+      print("Dashboard failed to load bookings: $e");
+      if (mounted) {
+        setState(() {
+          _isLoadingBookings = false;
+        });
+      }
+    }
   }
 
   Future<void> _loadServices() async {
@@ -266,44 +309,43 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
             const SizedBox(height: 16),
             _SectionCard(
               title: 'Upcoming Bookings',
-              child: Column(
-                children: upcomingBookings.take(3).map((booking) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: BookingCard(
-                      booking: booking,
-                      primaryLabel: 'Start Service',
-                      secondaryLabel: 'Mark As Completed',
-                      onTap: () {
-                        Navigator.pushNamed(
-                          context,
-                          AppRoutes.booking,
-                          arguments: booking,
-                        );
-                      },
-                      onPrimaryAction: () {
-                        _updateBooking(
-                          booking.copyWith(
-                            mainStatus: BookingMainStatus.ongoing,
+              child: _isLoadingBookings
+                  ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 24.0),
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                  : upcomingBookings.isEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 24.0),
+                          child: Center(
+                            child: Text(
+                              'No upcoming bookings',
+                              style: textTheme.bodySmall?.copyWith(
+                                color: AppColors.loginSubtitleText,
+                              ),
+                            ),
                           ),
-                        );
-                      },
-                      onSecondaryAction: () {
-                        _updateBooking(
-                          booking.copyWith(
-                            mainStatus: BookingMainStatus.completed,
-                          ),
-                        );
-                      },
-                      onPhoneTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Calling customer...')),
-                        );
-                      },
-                    ),
-                  );
-                }).toList(),
-              ),
+                        )
+                      : Column(
+                          children: upcomingBookings.take(3).map((booking) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: BookingCard(
+                                booking: booking,
+                                primaryLabel: null,
+                                secondaryLabel: null,
+                                onTap: widget.onNavigateToBookings,
+                                onPhoneTap: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Calling customer...')),
+                                  );
+                                },
+                              ),
+                            );
+                          }).toList(),
+                        ),
             ),
             const SizedBox(height: 72), // safe space for bottom nav + FAB
           ],

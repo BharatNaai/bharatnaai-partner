@@ -45,16 +45,8 @@ class ServiceOffering {
 
 /// Shared catalog of supported services for dropdowns.
 const List<String> kServiceOptions = <String>[
-  'HAIRCUT',
-  'BEARD',
-  'BASIC HAIRCUT',
-  'KIDS HAIRCUT',
-  'BEARD TRIM',
-  'SHAVE',
-  'HAIR COLOR',
-  'HAIR STYLING',
-  'HEAD MASSAGE',
-  'FACIAL',
-  'CLEANUP',
+  'Haircut',
+  'Shaving',
+  'Combo'
 ];
 

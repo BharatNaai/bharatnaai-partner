@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../models/booking.dart';
+import '../../repositories/booking_repository.dart';
+import '../../services/user_storage_service.dart';
 import '../../routes/app_routes.dart';
 import '../../widgets/booking_widgets.dart';
 
@@ -16,16 +18,17 @@ class BookingsListScreen extends StatefulWidget {
 
 class _BookingsListScreenState extends State<BookingsListScreen>
     with SingleTickerProviderStateMixin {
-  late List<Booking> _bookings;
+  List<Booking> _bookings = [];
+  bool _isLoading = false;
   late TabController _tabController;
   BookingMainStatus _selectedMainStatus = BookingMainStatus.upcoming;
 
   @override
   void initState() {
     super.initState();
-    _bookings = List<Booking>.from(kMockBookings);
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_handleTabSelection);
+    _loadBookings();
   }
 
   @override
@@ -40,6 +43,42 @@ class _BookingsListScreenState extends State<BookingsListScreen>
     setState(() {
       _selectedMainStatus = BookingMainStatus.values[_tabController.index];
     });
+  }
+
+  Future<void> _loadBookings() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final barberId = await UserStorageService.getBarberId();
+      final authToken = await UserStorageService.getAccessToken();
+
+      if (barberId == null || authToken == null) {
+        throw Exception('User authentication data missing');
+      }
+
+      final repo = BookingRepository.instance;
+      final list = await repo.getAllBookings(
+        barberId: barberId,
+        authToken: authToken,
+      );
+
+      if (!mounted) return;
+      setState(() {
+        _bookings = list;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to load bookings: $e'),
+        ),
+      );
+    }
   }
 
   void _updateBooking(Booking updated) {
@@ -123,14 +162,16 @@ class _BookingsListScreenState extends State<BookingsListScreen>
           
           // Swipeable List
           Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildBookingList(BookingMainStatus.upcoming),
-                _buildBookingList(BookingMainStatus.ongoing),
-                _buildBookingList(BookingMainStatus.completed),
-              ],
-            ),
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildBookingList(BookingMainStatus.upcoming),
+                      _buildBookingList(BookingMainStatus.ongoing),
+                      _buildBookingList(BookingMainStatus.completed),
+                    ],
+                  ),
           ),
         ],
       ),
@@ -168,16 +209,12 @@ class _BookingsListScreenState extends State<BookingsListScreen>
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: BookingCard(
             booking: booking,
-            primaryLabel: booking.mainStatus == BookingMainStatus.ongoing
-                ? 'Start Service'
-                : booking.mainStatus == BookingMainStatus.completed
-                ? 'View Details'
-                : 'Accept',
-            secondaryLabel: booking.mainStatus == BookingMainStatus.ongoing
-                ? 'Mark As Completed'
-                : booking.mainStatus == BookingMainStatus.upcoming
-                ? 'Reject'
-                : null,
+            primaryLabel: booking.mainStatus == BookingMainStatus.upcoming
+                ? 'Start'
+                : booking.mainStatus == BookingMainStatus.ongoing
+                    ? 'Completed'
+                    : 'Order Details',
+            secondaryLabel: null,
             onTap: () {
               Navigator.pushNamed(
                 context,
@@ -189,7 +226,7 @@ class _BookingsListScreenState extends State<BookingsListScreen>
               if (booking.mainStatus == BookingMainStatus.upcoming) {
                 _updateBooking(
                   booking.copyWith(
-                    actionStatus: BookingActionStatus.confirmed,
+                    mainStatus: BookingMainStatus.ongoing,
                   ),
                 );
               } else if (booking.mainStatus == BookingMainStatus.ongoing) {
@@ -198,25 +235,14 @@ class _BookingsListScreenState extends State<BookingsListScreen>
                     mainStatus: BookingMainStatus.completed,
                   ),
                 );
+              } else if (booking.mainStatus == BookingMainStatus.completed) {
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.booking,
+                  arguments: booking,
+                );
               }
             },
-            onSecondaryAction: booking.mainStatus == BookingMainStatus.upcoming
-                ? () {
-                    _updateBooking(
-                      booking.copyWith(
-                        actionStatus: BookingActionStatus.rejected,
-                      ),
-                    );
-                  }
-                : booking.mainStatus == BookingMainStatus.ongoing
-                    ? () {
-                        _updateBooking(
-                          booking.copyWith(
-                            mainStatus: BookingMainStatus.completed,
-                          ),
-                        );
-                      }
-                    : null,
             onPhoneTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
