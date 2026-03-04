@@ -1,9 +1,11 @@
 class ServiceOffering {
-  final String? id;
+  final dynamic id;
   final String serviceName;
   final int durationMinutes;
   final String experience;
   final String serviceCost;
+  final String? description;
+  final String? status;
   final String? notes;
 
   ServiceOffering({
@@ -12,6 +14,8 @@ class ServiceOffering {
     required this.durationMinutes,
     required this.experience,
     required this.serviceCost,
+    this.description,
+    this.status,
     this.notes,
   });
 
@@ -21,15 +25,20 @@ class ServiceOffering {
       'durationMinutes': durationMinutes,
       'experience': experience,
       'serviceCost': serviceCost,
+      'description': description,
+      'status': status,
     };
   }
 
   factory ServiceOffering.fromJson(Map<String, dynamic> json) {
     return ServiceOffering(
+      id: json['id'],
       serviceName: json['serviceName'] ?? '',
       durationMinutes: json['durationMinutes'] ?? 0,
-      experience: json['experience'] ?? 0,
+      experience: json['experience']?.toString() ?? '0',
       serviceCost: json['serviceCost']?.toString() ?? '0',
+      description: json['description'],
+      status: json['status'],
     );
   }
 }

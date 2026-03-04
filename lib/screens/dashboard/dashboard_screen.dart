@@ -14,6 +14,7 @@ import 'package:partner_app/screens/profile/barbers_profile.dart';
 import 'package:partner_app/screens/services/services_offered_screen.dart';
 import 'package:partner_app/models/service_offering.dart';
 import 'package:partner_app/repositories/service_repository.dart';
+import 'package:partner_app/services/user_storage_service.dart';
 import 'package:partner_app/widgets/common_text_field.dart';
 import 'package:partner_app/widgets/common_button.dart';
 import 'package:partner_app/widgets/service_offering_dialog.dart';
@@ -86,19 +87,25 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
 
   Future<void> _loadServices() async {
     try {
+      final barberId = await UserStorageService.getBarberId();
+      final authToken = await UserStorageService.getAccessToken();
+
+      if (barberId == null || authToken == null) {
+        return;
+      }
+
       final repo = ServiceRepository.instance;
-      final list = await repo.getServices();
+      final list = await repo.getBarberServices(
+        barberId: barberId,
+        authToken: authToken,
+      );
+      
       if (!mounted) return;
       setState(() {
         _services = List<ServiceOffering>.from(list);
       });
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to load services. Please try again.'),
-        ),
-      );
+      print("Dashboard failed to load services: $e");
     }
   }
 

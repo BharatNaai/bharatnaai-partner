@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:partner_app/core/constants/app_colors.dart';
 import 'package:partner_app/models/service_offering.dart';
 import 'package:partner_app/repositories/service_repository.dart';
+import 'package:partner_app/services/user_storage_service.dart';
 import 'package:partner_app/widgets/service_offering_dialog.dart';
 
 class ServicesOfferedScreen extends StatefulWidget {
@@ -27,8 +28,19 @@ class _ServicesOfferedScreenState extends State<ServicesOfferedScreen> {
       _isLoading = true;
     });
     try {
+      final barberId = await UserStorageService.getBarberId();
+      final authToken = await UserStorageService.getAccessToken();
+
+      if (barberId == null || authToken == null) {
+        throw Exception('User authentication data missing');
+      }
+
       final repo = ServiceRepository.instance;
-      final list = await repo.getServices();
+      final list = await repo.getBarberServices(
+        barberId: barberId,
+        authToken: authToken,
+      );
+      
       if (!mounted) return;
       setState(() {
         _services = list;
@@ -40,8 +52,8 @@ class _ServicesOfferedScreenState extends State<ServicesOfferedScreen> {
         _isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to load services. Please try again.'),
+        SnackBar(
+          content: Text('Failed to load services: $e'),
         ),
       );
     }

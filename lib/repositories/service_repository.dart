@@ -15,10 +15,42 @@ class ServiceRepository {
 
   final List<ServiceOffering> _services = <ServiceOffering>[];
 
-  /// Simulate GET /services
+  /// Get services for a specific barber from the API
+  Future<List<ServiceOffering>> getBarberServices({
+    required String barberId,
+    required String authToken,
+  }) async {
+    final endpoint = ApiConstants.getBarberServices.replaceFirst('{barber_id}', barberId);
+    final uri = Uri.parse('${ApiConstants.baseUrl}$endpoint');
+
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          ...ApiConstants.defaultHeaders,
+          'Authorization': 'Bearer $authToken',
+        },
+      );
+
+      print("Get Barber Services URL: $uri");
+      print("Status Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
+
+
+      if (response.statusCode == 200) {
+        final List<dynamic> decoded = jsonDecode(response.body);
+        return decoded.map((json) => ServiceOffering.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load services: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error getting barber services: $e");
+      rethrow;
+    }
+  }
+
+  /// Simulate GET /services (Deprecated in favor of getBarberServices)
   Future<List<ServiceOffering>> getServices() async {
-    // Fake network delay
-    await Future<void>.delayed(const Duration(milliseconds: 300));
     // Return a copy so callers cannot mutate internal list directly
     return List<ServiceOffering>.unmodifiable(_services);
   }
