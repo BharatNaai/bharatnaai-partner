@@ -11,12 +11,16 @@ import 'providers/welcome_provider.dart';
 import 'providers/location_provider.dart';
 import 'providers/earnings_provider.dart';
 import 'providers/profile_setup_provider.dart';
+import 'core/services/connectivity_service.dart';
+import 'core/utils/navigator_key.dart';
 
-// Global navigator key
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize global connectivity monitoring
+  ConnectivityService().initialize();
 
   // Configure audio session for iOS
   if (Platform.isIOS) {

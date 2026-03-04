@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import 'package:partner_app/main.dart';
+import 'package:partner_app/core/utils/navigator_key.dart';
 import 'package:partner_app/services/user_storage_service.dart';
 import 'package:partner_app/services/token_refresh_service.dart';
 import 'package:partner_app/services/global_error_handler.dart';
@@ -312,7 +312,7 @@ class TokenManager {
     if (_context == null || !_context!.mounted) {
       debugPrint('TokenManager: Context not available, attempting navigatorKey fallback');
       try {
-        navigatorKey.currentState?.pushNamedAndRemoveUntil(
+        NavigatorService.navigatorKey.currentState?.pushNamedAndRemoveUntil(
           '/login',
               (route) => false,
         );
@@ -350,7 +350,7 @@ class TokenManager {
         );
       } catch (e) {
         // Try navigatorKey directly as a fallback
-        navigatorKey.currentState?.pushNamedAndRemoveUntil(
+        NavigatorService.navigatorKey.currentState?.pushNamedAndRemoveUntil(
           '/login',
               (route) => false,
         );

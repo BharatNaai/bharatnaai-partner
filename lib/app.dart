@@ -2,6 +2,7 @@ import 'package:partner_app/routes/app_routes.dart';
 import 'package:partner_app/core/constants/app_strings.dart';
 import 'package:partner_app/widgets/connectivity_banner.dart';
 import 'package:flutter/material.dart';
+import 'package:partner_app/core/utils/navigator_key.dart';
 import 'package:partner_app/services/route_observer_service.dart';
 import 'dart:async';
 import 'package:app_links/app_links.dart';
@@ -40,7 +41,7 @@ class _MyAppState extends State<MyApp> {
       // Initialize SessionExpiryService with a Navigator context for navigation
       Future<void>.delayed(const Duration(milliseconds: 100), () {
         try {
-          final ctx = navigatorKey.currentContext;
+          final ctx = NavigatorService.context;
           if (ctx != null) {
             SessionExpiryService.instance.initialize(ctx);
           }
@@ -70,7 +71,7 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      navigatorKey: navigatorKey,
+      navigatorKey: NavigatorService.navigatorKey,
       navigatorObservers: [RouteObserverService().routeObserver],
       onGenerateRoute: AppRoutes.generateRoute,
       initialRoute: AppRoutes.splash,
