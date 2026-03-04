@@ -102,32 +102,23 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
     }
   }
 
-  Future<void> _openAddServiceDialog() async {
-    final ServiceOffering? newService = await showServiceOfferingDialog(
+  Future<void> _openServiceConfiguration() async {
+    final bool? updated = await showServiceOfferingDialog(
       context: context,
-      initialService: null,
+      initialServices: _services,
+      salonId: 1, // Default for now
     );
 
-    if (newService == null) {
-      return;
-    }
-
-    final repo = ServiceRepository.instance;
-
-    try {
-      await repo.addService(newService);
+    if (updated == true) {
       await _loadServices();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Service added successfully.')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to add service. Please try again.'),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Services updated successfully.')),
+        );
+      }
     }
   }
+
 
   void _navigateToServices() {
     Navigator.pushNamed(context, AppRoutes.manageServices);
@@ -312,11 +303,12 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _openAddServiceDialog,
+        onPressed: _openServiceConfiguration,
         backgroundColor: AppColors.buttonPrimary,
         icon: const Icon(Icons.add, color: Colors.white),
         label: const Text('Service', style: TextStyle(color: AppColors.white)),
       ),
+
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }

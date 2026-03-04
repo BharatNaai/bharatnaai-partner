@@ -47,32 +47,25 @@ class _ServicesOfferedScreenState extends State<ServicesOfferedScreen> {
     }
   }
 
-  Future<void> _editService(ServiceOffering service) async {
-    final ServiceOffering? updated = await showServiceOfferingDialog(
+  Future<void> _openServiceDialog() async {
+    final bool? updated = await showServiceOfferingDialog(
       context: context,
-      initialService: service,
+      initialServices: _services,
+      // For now using defaults for salon details as per DTO structure
+      salonId: 1,
+      openingTime: "09:00",
+      closingTime: "21:00",
     );
 
-    if (updated == null) {
-      return;
-    }
-
-    final repo = ServiceRepository.instance;
-
-    try {
-      await repo.updateService(updated);
+    if (updated == true) {
       await _loadServices();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Service updated successfully.'),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to update service. Please try again.'),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Services updated successfully.'),
+          ),
+        );
+      }
     }
   }
 
@@ -83,7 +76,7 @@ class _ServicesOfferedScreenState extends State<ServicesOfferedScreen> {
         return AlertDialog(
           title: const Text('Delete Service'),
           content: Text(
-            'Are you sure you want to delete "${service.name}"?',
+            'Are you sure you want to delete "${service.serviceName}"?',
           ),
           actions: [
             TextButton(
@@ -103,19 +96,25 @@ class _ServicesOfferedScreenState extends State<ServicesOfferedScreen> {
 
     final repo = ServiceRepository.instance;
     try {
-      await repo.deleteService(service.id);
-      await _loadServices();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Service deleted successfully.'),
-        ),
-      );
+      if (service.id != null) {
+        await repo.deleteService(service.id!);
+        await _loadServices();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Service deleted successfully.'),
+            ),
+          );
+        }
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to delete service. Please try again.'),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to delete service. Please try again.'),
+          ),
+        );
+      }
     }
   }
 
@@ -128,6 +127,12 @@ class _ServicesOfferedScreenState extends State<ServicesOfferedScreen> {
         title: const Text('Services I Offer'),
       ),
       backgroundColor: AppColors.loginBackgroundEnd,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _openServiceDialog,
+        backgroundColor: AppColors.primaryColor,
+        icon: const Icon(Icons.edit_note, color: Colors.white),
+        label: const Text('Configure Services', style: TextStyle(color: Colors.white)),
+      ),
       body: RefreshIndicator(
         onRefresh: _loadServices,
         child: _isLoading
@@ -145,6 +150,14 @@ class _ServicesOfferedScreenState extends State<ServicesOfferedScreen> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 16),
+                      Center(
+                        child: TextButton.icon(
+                          onPressed: _openServiceDialog,
+                          icon: const Icon(Icons.add),
+                          label: const Text('Add Services'),
+                        ),
+                      ),
                     ],
                   )
                 : ListView.separated(
@@ -153,104 +166,100 @@ class _ServicesOfferedScreenState extends State<ServicesOfferedScreen> {
                     separatorBuilder: (_, __) => const SizedBox(height: 12),
                     itemBuilder: (BuildContext context, int index) {
                       final service = _services[index];
-                return Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x10182840),
-                        blurRadius: 12,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              service.name,
-                              style: textTheme.titleMedium?.copyWith(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
-                              ),
-                              overflow: TextOverflow.ellipsis,
+                      return Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x10182840),
+                              blurRadius: 12,
+                              offset: Offset(0, 4),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '\u20b9${service.cost}',
-                            style: textTheme.titleMedium?.copyWith(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primaryColor,
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.edit_outlined, size: 20),
-                            onPressed: () => _editService(service),
-                          ),
-                          IconButton(
-                            icon:
-                                const Icon(Icons.delete_outline, size: 20),
-                            onPressed: () => _deleteService(service),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.schedule_outlined,
-                            size: 16,
-                            color: AppColors.loginSubtitleText,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${service.averageTime} mins',
-                            style: textTheme.bodySmall?.copyWith(
-                              fontSize: 12,
-                              color: AppColors.loginSubtitleText,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Icon(
-                            Icons.star_outline,
-                            size: 16,
-                            color: AppColors.loginSubtitleText,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${service.experience} yrs exp',
-                            style: textTheme.bodySmall?.copyWith(
-                              fontSize: 12,
-                              color: AppColors.loginSubtitleText,
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (service.notes.isNotEmpty) ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          service.notes,
-                          style: textTheme.bodySmall?.copyWith(
-                            fontSize: 12,
-                            color: AppColors.textPrimary,
-                          ),
+                          ],
                         ),
-                      ],
-                    ],
-                  ),
-                );
-              },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    service.serviceName,
+                                    style: textTheme.titleMedium?.copyWith(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '\u20b9${service.serviceCost}',
+                                  style: textTheme.titleMedium?.copyWith(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete_outline, size: 20),
+                                  onPressed: () => _deleteService(service),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.schedule_outlined,
+                                  size: 16,
+                                  color: AppColors.loginSubtitleText,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${service.durationMinutes} mins',
+                                  style: textTheme.bodySmall?.copyWith(
+                                    fontSize: 12,
+                                    color: AppColors.loginSubtitleText,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Icon(
+                                  Icons.star_outline,
+                                  size: 16,
+                                  color: AppColors.loginSubtitleText,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${service.experience} yrs exp',
+                                  style: textTheme.bodySmall?.copyWith(
+                                    fontSize: 12,
+                                    color: AppColors.loginSubtitleText,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (service.notes != null && service.notes!.isNotEmpty) ...[
+                              const SizedBox(height: 8),
+                              Text(
+                                service.notes!,
+                                style: textTheme.bodySmall?.copyWith(
+                                  fontSize: 12,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      );
+                    },
                   ),
       ),
     );
   }
 }
+
