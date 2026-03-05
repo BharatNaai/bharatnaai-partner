@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/booking.dart';
 import '../../widgets/booking_widgets.dart';
+import '../../providers/booking_provider.dart';
+import 'package:provider/provider.dart';
 
 class BookingDetailsScreen extends StatefulWidget {
   final Booking booking;
@@ -23,16 +25,29 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
     _booking = widget.booking;
   }
 
-  void _startService() {
-    setState(() {
-      _booking = _booking.copyWith(mainStatus: BookingMainStatus.ongoing);
-    });
-  }
+  Future<void> _updateStatus(BookingMainStatus newStatus) async {
+    final success = await context.read<BookingProvider>().updateStatus(_booking, newStatus);
+    if (!mounted) return;
 
-  void _markCompleted() {
-    setState(() {
-      _booking = _booking.copyWith(mainStatus: BookingMainStatus.completed);
-    });
+    if (success) {
+      setState(() {
+        _booking = _booking.copyWith(mainStatus: newStatus);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Status updated to ${newStatus.name}'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      final error = context.read<BookingProvider>().errorMessage;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to update status: $error'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -57,13 +72,35 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: BookingCard(
-          booking: _booking,
-          primaryLabel: 'Start Service',
-          secondaryLabel: 'Mark As Completed',
-          onTap: () {},
-          onPrimaryAction: _startService,
-          onSecondaryAction: _markCompleted,
+        child: Consumer<BookingProvider>(
+          builder: (context, provider, child) {
+            String? primaryLabel;
+            VoidCallback? onPrimary;
+
+            if (_booking.mainStatus == BookingMainStatus.upcoming) {
+              primaryLabel = 'Start Service';
+              onPrimary = () => _updateStatus(BookingMainStatus.ongoing);
+            } else if (_booking.mainStatus == BookingMainStatus.ongoing) {
+              primaryLabel = 'Mark As Completed';
+              onPrimary = () => _updateStatus(BookingMainStatus.completed);
+            }
+
+            return Column(
+              children: [
+                if (provider.isLoading)
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 16),
+                    child: LinearProgressIndicator(),
+                  ),
+                BookingCard(
+                  booking: _booking,
+                  primaryLabel: primaryLabel,
+                  onTap: () {},
+                  onPrimaryAction: onPrimary,
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

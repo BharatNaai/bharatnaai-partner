@@ -11,6 +11,7 @@ import 'providers/welcome_provider.dart';
 import 'providers/location_provider.dart';
 import 'providers/earnings_provider.dart';
 import 'providers/profile_setup_provider.dart';
+import 'providers/booking_provider.dart';
 import 'core/services/connectivity_service.dart';
 import 'core/utils/navigator_key.dart';
 
@@ -61,6 +62,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => LocationProvider()),
         ChangeNotifierProvider(create: (_) => EarningsProvider()),
         ChangeNotifierProvider(create: (_) => ProfileSetupProvider()),
+        ChangeNotifierProvider(create: (_) => BookingProvider()),
       ],
       child: const MyApp(),
     ),

@@ -8,6 +8,8 @@ import '../../repositories/booking_repository.dart';
 import '../../services/user_storage_service.dart';
 import '../../routes/app_routes.dart';
 import '../../widgets/booking_widgets.dart';
+import '../../providers/booking_provider.dart';
+import 'package:provider/provider.dart';
 
 class BookingsListScreen extends StatefulWidget {
   const BookingsListScreen({super.key});
@@ -18,8 +20,6 @@ class BookingsListScreen extends StatefulWidget {
 
 class _BookingsListScreenState extends State<BookingsListScreen>
     with SingleTickerProviderStateMixin {
-  List<Booking> _bookings = [];
-  bool _isLoading = false;
   late TabController _tabController;
   BookingMainStatus _selectedMainStatus = BookingMainStatus.upcoming;
 
@@ -28,7 +28,9 @@ class _BookingsListScreenState extends State<BookingsListScreen>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_handleTabSelection);
-    _loadBookings();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<BookingProvider>().fetchBookings();
+    });
   }
 
   @override
@@ -45,57 +47,32 @@ class _BookingsListScreenState extends State<BookingsListScreen>
     });
   }
 
-  Future<void> _loadBookings() async {
-    setState(() {
-      _isLoading = true;
-    });
-    try {
-      final barberId = await UserStorageService.getBarberId();
-      final authToken = await UserStorageService.getAccessToken();
-
-      if (barberId == null || authToken == null) {
-        throw Exception('User authentication data missing');
-      }
-
-      final repo = BookingRepository.instance;
-      final list = await repo.getAllBookings(
-        barberId: barberId,
-        authToken: authToken,
-      );
-
-      if (!mounted) return;
-      setState(() {
-        _bookings = list;
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-      });
+  Future<void> _updateBookingStatus(Booking booking, BookingMainStatus newStatus) async {
+    final success = await context.read<BookingProvider>().updateStatus(booking, newStatus);
+    if (!mounted) return;
+    
+    if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to load bookings: $e'),
+          content: Text('Status updated to ${newStatus.name}'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      final error = context.read<BookingProvider>().errorMessage;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to update status: $error'),
+          backgroundColor: Colors.red,
         ),
       );
     }
   }
 
-  void _updateBooking(Booking updated) {
-    setState(() {
-      _bookings = _bookings
-          .map((b) => b.id == updated.id ? updated : b)
-          .toList(growable: false);
-    });
-  }
-
-  List<Booking> _getBookingsByStatus(BookingMainStatus status) {
-    return _bookings.where((b) => b.mainStatus == status).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     final textTheme = GoogleFonts.interTextTheme(Theme.of(context).textTheme);
+    final bookingProvider = context.watch<BookingProvider>();
 
     return Scaffold(
       backgroundColor: AppColors.loginBackgroundEnd,
@@ -162,7 +139,7 @@ class _BookingsListScreenState extends State<BookingsListScreen>
           
           // Swipeable List
           Expanded(
-            child: _isLoading
+            child: bookingProvider.isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : TabBarView(
                     controller: _tabController,
@@ -179,7 +156,7 @@ class _BookingsListScreenState extends State<BookingsListScreen>
   }
 
   Widget _buildBookingList(BookingMainStatus status) {
-    final bookings = _getBookingsByStatus(status);
+    final bookings = context.read<BookingProvider>().getBookingsByStatus(status);
     
     if (bookings.isEmpty) {
       return Center(
@@ -223,18 +200,9 @@ class _BookingsListScreenState extends State<BookingsListScreen>
               );
             },
             onPrimaryAction: () {
-              if (booking.mainStatus == BookingMainStatus.upcoming) {
-                _updateBooking(
-                  booking.copyWith(
-                    mainStatus: BookingMainStatus.ongoing,
-                  ),
-                );
-              } else if (booking.mainStatus == BookingMainStatus.ongoing) {
-                _updateBooking(
-                  booking.copyWith(
-                    mainStatus: BookingMainStatus.completed,
-                  ),
-                );
+              final next = booking.nextStatus;
+              if (next != null) {
+                _updateBookingStatus(booking, next);
               } else if (booking.mainStatus == BookingMainStatus.completed) {
                 Navigator.pushNamed(
                   context,

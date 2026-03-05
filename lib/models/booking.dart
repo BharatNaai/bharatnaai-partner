@@ -96,6 +96,30 @@ class Booking {
       actionStatus: BookingActionStatus.confirmed,
     );
   }
+
+  String get statusString {
+    switch (mainStatus) {
+      case BookingMainStatus.ongoing:
+        return 'ONGOING';
+      case BookingMainStatus.completed:
+        return 'COMPLETED';
+      case BookingMainStatus.upcoming:
+      default:
+        return 'UPCOMING';
+    }
+  }
+
+  BookingMainStatus? get nextStatus {
+    switch (mainStatus) {
+      case BookingMainStatus.upcoming:
+        return BookingMainStatus.ongoing;
+      case BookingMainStatus.ongoing:
+        return BookingMainStatus.completed;
+      case BookingMainStatus.completed:
+      default:
+        return null;
+    }
+  }
 }
 
 const List<Booking> kMockBookings = [
