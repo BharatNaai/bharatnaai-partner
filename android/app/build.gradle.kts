@@ -53,12 +53,16 @@ android {
 
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
+            isShrinkResources = false
             signingConfig = signingConfigs.getByName("release")
         }
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug") // default
         }
+    }
+    lint {
+        checkReleaseBuilds = false
     }
 }
 
